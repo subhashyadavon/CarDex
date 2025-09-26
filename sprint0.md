@@ -43,7 +43,7 @@ These are the features that are not necessary right away, but will be nice to ha
 
 ---
 
-## User Stories
+# User Stories
 
     # NEED USER STORIES FOR ALL 5 LISTED CORE FEATURES. Should probably just create github issues and link them here.
     Write user stories in the standard format:
@@ -56,6 +56,23 @@ These are the features that are not necessary right away, but will be nice to ha
 - **As a player**, I want to open packs so that I can collect rare and exciting cars.  
 - **As a trader**, I want to swap cars with other players so that I can complete my favorite collections.  
 - **As a competitor**, I want to race my cars against others so that I can test my collection’s strength.  
+
+## User Story 1: Account Creation
+
+**"As a new user, I want to create an account with username and password, so that I can login and start collecting and trading car cards"**
+
+- [ ] User can register with a unique username and secure password
+- [ ] Username must be unique across the platform
+- [ ] User receives starting currency (e.g., 1000 coins) upon account creation
+- [ ] System generates unique UUID for each user
+- [ ] Error messages display for duplicate usernames or invalid passwords
+
+## User Story 2: Account Login
+
+**"As an existing user, I want to login, so that I collect and trade car cards"**
+
+- [ ] User can login using existing username and password
+- [ ] Error messages display for invalid creditentials (don't specify if username or password error)
 
 ---
 
