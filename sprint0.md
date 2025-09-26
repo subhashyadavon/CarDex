@@ -57,8 +57,7 @@ These are the features that are not necessary right away, but will be nice to ha
 - **As a trader**, I want to swap cars with other players so that I can complete my favorite collections.  
 - **As a competitor**, I want to race my cars against others so that I can test my collection’s strength.  
 
-## User Story 1: Account Creation
-
+## [User Story 1: Account Creation](https://github.com/VSHAH1210/CarDex/issues/1)
 **"As a new user, I want to create an account with username and password, so that I can login and start collecting and trading car cards"**
 
 - [ ] User can register with a unique username and secure password
@@ -67,14 +66,95 @@ These are the features that are not necessary right away, but will be nice to ha
 - [ ] System generates unique UUID for each user
 - [ ] Error messages display for duplicate usernames or invalid passwords
 
-## User Story 2: Account Login
 
-**"As an existing user, I want to login, so that I collect and trade car cards"**
+## **[User Story 2: Daily Login Rewards](https://github.com/VSHAH1210/CarDex/issues/3)**
+**"As a registered user, I want to earn currency by logging in daily, so that I can purchase packs without spending real money"**  
 
-- [ ] User can login using existing username and password
-- [ ] Error messages display for invalid creditentials (don't specify if username or password error)
-
+- [ ] User receives currency reward upon daily login (e.g., 100 coins)
+- [ ] Currency is automatically added to user's account balance
+- [ ] User can only claim one reward per 24-hour period
+- [ ] System tracks last login timestamp to prevent multiple claims
+- [ ] Balance updates are reflected immediately in the user interface
+- [ ] Login streak bonuses apply for consecutive days (optional enhancement)
 ---
+
+## **[User Story 3: Pack Purchase](https://github.com/VSHAH1210/CarDex/issues/4)**
+**"As a collector, I want to buy packs using my earned currency, so that I can obtain new cards for my collection"**  
+
+- [ ] User can browse available packs from different collections (JDM, Muscle, Supercars, etc.)
+- [ ] Each pack displays its collection name, image, and currency cost
+- [ ] User can only purchase packs if they have sufficient currency
+- [ ] Currency is deducted from user balance upon successful purchase
+- [ ] Purchased pack is added to user's "owned_packs" list
+- [ ] Transaction fails gracefully with error message if insufficient funds
+- [ ] Purchase confirmation is displayed to user
+
+## **[User Story 4: Pack Opening](https://github.com/VSHAH1210/CarDex/issues/5)**
+**"As a collector, I want to open packs I own, so that I can reveal new cards and add them to my garage"**  
+
+- [ ] User can view all packs they own
+- [ ] User can select and open any owned pack
+- [ ] System randomly selects a vehicle from the pack's collection
+- [ ] System randomly assigns a grade (FACTORY, LIMITED_RUN, or NISMO) based on rarity percentages
+- [ ] New card is created with assigned vehicle, grade, and calculated value
+- [ ] Card is added to user's "owned_cards" collection
+- [ ] Pack is removed from user's "owned_packs" after opening
+- [ ] Opening animation/reveal is displayed to user
+- [ ] User cannot open the same pack twice
+
+## **[User Story 5: Virtual Garage Management](https://github.com/VSHAH1210/CarDex/issues/6)**
+**"As a collector, I want to view and organize my card collection, so that I can track my progress and showcase my best cards"**  
+
+- [ ] User can view all cards they own in a gallery/list format
+- [ ] Each card displays vehicle image, year, make, model, stats, grade, and value
+- [ ] User can filter cards by collection, grade, manufacturer, or year
+- [ ] User can sort cards by value, year, or alphabetically
+- [ ] Card count and total collection value are displayed
+- [ ] User can view detailed stats for individual cards
+- [ ] Collection completion percentage is shown for each collection set
+
+## **[User Story 6: Listing Card for Sale](https://github.com/VSHAH1210/CarDex/issues/7)**
+**"As a seller, I want to list my cards on the marketplace for currency, so that I can earn coins to buy more packs"**  
+
+- [ ] User can select a card from their collection to list for sale
+- [ ] User can set a price in currency for the card
+- [ ] System suggests a price based on card value and market trends (optional)
+- [ ] Listed card creates an OPEN_TRADE record with type "FOR_PRICE"
+- [ ] Listed card remains in user's collection but is marked as "in trade"
+- [ ] User can view all their active listings
+- [ ] User can cancel a listing at any time before it's purchased
+- [ ] Multiple cards can be listed simultaneously
+
+## **[User Story 7: Trading Cards](https://github.com/VSHAH1210/CarDex/issues/8)**
+**"As a trader, I want to offer my card in exchange for another specific card, so that I can complete my collection through direct trades"**  
+
+- [ ] User can select a card to offer for trade
+- [ ] User can specify which card they want in return (by searching/browsing)
+- [ ] System creates an OPEN_TRADE record with type "FOR_CARD"
+- [ ] Both cards are marked as "in trade" and cannot be listed elsewhere
+- [ ] Trade offer appears in marketplace filtered by "card trades"
+- [ ] Owner of the wanted card can accept or decline the offer
+- [ ] User can cancel their trade offer before it's accepted
+- [ ] System validates both cards exist and are owned by correct users
+
+## **[User Story 8: Completing Marketplace Transactions](https://github.com/VSHAH1210/CarDex/issues/9)**
+**"As a buyer, I want to purchase cards or accept trade offers from the marketplace, so that I can acquire cards I need for my collection"**  
+
+- [ ] User can browse all active marketplace listings (both currency sales and card trades)
+- [ ] User can filter marketplace by collection, grade, price range, or trade type
+- [ ] **For Currency Purchases:**
+  - [ ] User can only purchase if they have sufficient currency
+  - [ ] Currency is transferred from buyer to seller
+  - [ ] Card ownership transfers from seller to buyer
+- [ ] **For Card Trades:**
+  - [ ] User can only accept if they own the requested card
+  - [ ] Both cards transfer ownership simultaneously
+  - [ ] System validates both users still own their respective cards
+- [ ] COMPLETED_TRADE record is created with all transaction details
+- [ ] OPEN_TRADE listing is removed from marketplace
+- [ ] Both users receive confirmation of completed transaction
+- [ ] Trade history is recorded with execution date and details
+- [ ] Transaction fails gracefully if conditions aren't met (insufficient funds, card no longer available)
 
 # Initial Architecture
 
