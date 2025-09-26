@@ -45,18 +45,6 @@ These are the features that are not necessary right away, but will be nice to ha
 
 # User Stories
 
-    # NEED USER STORIES FOR ALL 5 LISTED CORE FEATURES. Should probably just create github issues and link them here.
-    Write user stories in the standard format:
-
-        As a [role], I want [goal] so that [benefit].
-
-    Include acceptance criteria for each core feature. Use the RubyGarage acceptance criteria guide as a template.
-
-
-- **As a player**, I want to open packs so that I can collect rare and exciting cars.  
-- **As a trader**, I want to swap cars with other players so that I can complete my favorite collections.  
-- **As a competitor**, I want to race my cars against others so that I can test my collection’s strength.  
-
 ## [User Story 1: Account Creation](https://github.com/VSHAH1210/CarDex/issues/1)
 **"As a new user, I want to create an account with username and password, so that I can login and start collecting and trading car cards"**
 
@@ -193,5 +181,6 @@ Frontend (Flutter & React): 2 members will focus on mobile and web UI/UX.
 Backend (API & Logic): 2 members will implement API endpoints, authentication, and racing/trading logic.
 
 Database & DevOps: 2 members will design schemas, manage migrations with Prisma, and handle Docker setup/deployment.
+
 
 We will coordinate work using weekly meetings, short sprint cycles, and GitHub pull requests with code reviews. Communication will be managed through a team chat (e.g., Discord/Slack) and task tracking in GitHub Projects or Jira.
