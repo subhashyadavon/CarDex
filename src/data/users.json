@@ -1,0 +1,42 @@
+[
+  {
+    "id": 1,
+    "username": "speedster42",
+    "password": "$2a$10$N9qo8uLOickgx2ZMRZoMye",
+    "currency": 5000,
+    "owned_cards": [1, 2, 5, 8],
+    "owned_packs": [1],
+    "open_trades": [1],
+    "trade_history": [1]
+  },
+  {
+    "id": 2,
+    "username": "drift_king",
+    "password": "$2a$10$N9qo8uLOickgx2ZMRZoMye",
+    "currency": 3200,
+    "owned_cards": [3, 4, 6],
+    "owned_packs": [],
+    "open_trades": [2],
+    "trade_history": [1]
+  },
+  {
+    "id": 3,
+    "username": "turbo_tuner",
+    "password": "$2a$10$N9qo8uLOickgx2ZMRZoMye",
+    "currency": 1500,
+    "owned_cards": [7],
+    "owned_packs": [2, 3],
+    "open_trades": [],
+    "trade_history": []
+  },
+  {
+    "id": 4,
+    "username": "vtec_warrior",
+    "password": "$2a$10$N9qo8uLOickgx2ZMRZoMye",
+    "currency": 800,
+    "owned_cards": [9, 10],
+    "owned_packs": [],
+    "open_trades": [3],
+    "trade_history": []
+  }
+]
