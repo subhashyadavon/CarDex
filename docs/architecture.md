@@ -10,15 +10,16 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 > **NOTE**
 > ChatGPT was used to assist in drafting, but the actual architecture diagrams and data flow are original.
 
----
-
-## Core Data Objects
-
 <p align="center">
   <img src="../assets/arch_full.png" alt="Full Arch" width="800"/>
 </p>
 
-### USER
+</br>
+</br>
+
+# Data Objects
+
+## USER
 
 *Users that will use the application*
 
@@ -43,9 +44,9 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 * 1:N with **COMPLETED_TRADE** (as buyer and seller)
 * 1:N with **REWARDS**
 
----
+</br>
 
-### VEHICLE
+## VEHICLE
 
 *Master vehicle metadata. Basis for cards and packs. Includes stats and other model information*
 
@@ -68,9 +69,9 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 * 1:N with **CARD** (a vehicle can generate many card instances)
 * N:M with **COLLECTION** (vehicles belong to collections)
 
----
+</br>
 
-### CARD
+## CARD
 
 *An owned card instance, tied to a specific VEHICLE.*
 
@@ -93,9 +94,9 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 * 1:N with **OPEN_TRADE**
 * 1:N with **COMPLETED_TRADE**
 
----
+</br>
 
-### PACK
+## PACK
 
 *Unopened randomized pool of cards from a collection.*
 
@@ -120,9 +121,9 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 2. Added to user inventory
 3. When opened → deleted and generates new CARD instances
 
----
+</br>
 
-### COLLECTION
+## COLLECTION
 
 *Themed set of vehicles defining pack contents.*
 
@@ -142,11 +143,9 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 * 1:N with **PACK**
 * 1:N with **CARD**
 
----
+</br>
 
-## Trading System
-
-### OPEN_TRADE
+## OPEN_TRADE
 
 *Active trade listing.*
 
@@ -166,9 +165,9 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 * N:1 with **USER**
 * N:1 with **CARD**
 
----
+</br>
 
-### COMPLETED_TRADE
+## COMPLETED_TRADE
 
 *Historical record of executed trades.*
 
@@ -190,11 +189,9 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 * N:1 with **USER** (buyer & seller)
 * N:1 with **CARD** (seller & optionally buyer)
 
----
+</br>
 
-## Rewards System
-
-### REWARDS
+## REWARDS
 
 *Tracks claimable items/currency.*
 
@@ -217,23 +214,23 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 * CARD_FROM_TRADE → Card from trade
 * CURRENCY_FROM_TRADE → Currency from trade
 
----
+</br>
+</br>
 
-
-## ENUM Data Types
+# ENUM Data Types
 
 <p align="center">
   <img src="../assets/arch_enums.png" alt="Arch Enums" width="800"/>
 </p>
 
-### TRADE_ENUM
+## TRADE_ENUM
 
 | Value         | Meaning                |
 | ------------- | ---------------------- |
 | **FOR_CARD**  | Trade for another card |
 | **FOR_PRICE** | Trade for currency     |
 
-### GRADE_ENUM
+## GRADE_ENUM
 
 | Value           | Meaning               |
 | --------------- | --------------------- |
@@ -241,7 +238,7 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 | **LIMITED_RUN** | Rare, limited edition |
 | **NISMO**       | Legendary rarity      |
 
-### REWARD_ENUM
+## REWARD_ENUM
 
 | Value                   | Meaning                               |
 | ----------------------- | ------------------------------------- |
@@ -250,9 +247,16 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 | **CARD_FROM_TRADE**     | Card earned from trade completion     |
 | **CURRENCY_FROM_TRADE** | Currency earned from trade completion |
 
----
+</br>
+</br>
 
-## Key Workflows
+# Workflows
+
+## Cards, Packs, and Collection
+
+<p align="center">
+  <img src="../assets/arch_cards_packs_collection.png" alt="Full Arch" width="800"/>
+</p>
 
 ### Purchasing a Pack
 
@@ -268,31 +272,16 @@ We chose to use an ID-based system (UUIDs) to connect tables, layers, and (event
 3. Create CARD instances
 4. Delete PACK
 
+</br>
+
+## Rewards and Trading
+
+<p align="center">
+  <img src="../assets/arch_rewards_trading.png" alt="Full Arch" width="800"/>
+</p>
+
 ### Completing Trades
 
 * **FOR_PRICE:** Currency exchanged, card ownership transferred
 * **FOR_CARD:** Card-for-card swap
 * In both: OPEN_TRADE deleted, COMPLETED_TRADE + REWARDS created
-
----
-
-## Design Notes
-
-* **Scalability:** UUIDs for distributed use, separate active vs completed trades.
-* **Integrity:** Atomic ownership, transactional trades, currency never negative.
-* **Security:** Hash passwords, validate transactions, rate-limit actions.
-* **Future Enhancements:** Auctions, limited supply vehicles, reward expiration, daily login bonuses.
-
----
-
-# Summary
-
-CarDex supports:
-
-* Pack purchasing/opening
-* Card rarity system
-* Currency & card-for-card trades
-* Trade history tracking
-* Unified rewards inbox
-* ENUMs for consistent trade, reward, and grade typing
-* Scalable collection-based content
