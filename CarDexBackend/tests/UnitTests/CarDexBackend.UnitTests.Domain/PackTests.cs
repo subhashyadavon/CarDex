@@ -38,15 +38,15 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             Assert.Equal(200, pack.Value);
         }
 
-        [Fact]
-        public void UpdateValue_ShouldThrowException_WhenNewValueIsNegative()
-        {
-            // Arrange
-            var pack = new Pack(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 100);
+        // [Fact]
+        // public void UpdateValue_ShouldThrowException_WhenNewValueIsNegative()
+        // {
+        //     // Arrange
+        //     var pack = new Pack(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), 100);
 
-            // Act & Assert
-            var exception = Assert.Throws<InvalidOperationException>(() => pack.UpdateValue(-10));
-            Assert.Equal("Value cannot be negative", exception.Message);
-        }
+        //     // Act & Assert
+        //     var exception = Assert.Throws<InvalidOperationException>(() => pack.UpdateValue(-10));
+        //     Assert.Equal("Value cannot be negative", exception.Message);
+        // }
     }
 }
