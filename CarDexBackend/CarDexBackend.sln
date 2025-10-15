@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{684A4178
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{AD39CCD6-447C-4DFD-AAE2-D1F845F87759}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.UnitTests.Api", "CarDexBackend\tests\UnitTests\CarDexBackend.UnitTests.Api\CarDexBackend.UnitTests.Api.csproj", "{40904DD9-DEF2-4009-B6FB-C09BAAA43748}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.UnitTests.Domain", "tests\UnitTests\CarDexBackend.UnitTests.Domain\CarDexBackend.UnitTests.Domain.csproj", "{38ED0EC0-2625-4313-81D1-0E6AC5DD1C60}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{C4D166B0-DB37-406A-BC9A-5B2D85A9AAED}"
@@ -17,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Dtos", "Share
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Services", "CarDexBackend.Services\CarDexBackend.Services.csproj", "{534ED8B4-0517-42C0-AD54-FEC582EA70C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.API", "CarDexBackend.API\CarDexBackend.API.csproj", "{18E155AA-22BA-41B9-8D78-5A90FDC78DCB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Api", "CarDexBackend.Api\CarDexBackend.Api.csproj", "{18E155AA-22BA-41B9-8D78-5A90FDC78DCB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{D2CA6B12-200E-317A-40BC-1837600FF404}"
 EndProject
