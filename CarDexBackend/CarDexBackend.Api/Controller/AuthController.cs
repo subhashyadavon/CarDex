@@ -3,7 +3,7 @@ using CarDexBackend.Shared.Dtos.Requests;
 using CarDexBackend.Shared.Dtos.Responses;
 using CarDexBackend.Services;
 
-namespace CarDexBackend.Controllers
+namespace CarDexBackend.Api.Controllers
 {
     /// <summary>
     /// Handles user authentication and account management operations.
