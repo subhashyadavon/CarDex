@@ -166,5 +166,4 @@ Specifically, AI assistance was used to:
 
 - Format XML documentation comments for controllers and DTOs.
 - Provide mock service structure and test case suggestions for the unit tests.
-
-- Helping with writing documentation markdown (md) files.
+- Helping with writing documentation markdown (md) files.  
