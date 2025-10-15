@@ -4,142 +4,143 @@
 
 # Overview
 
-Below is the full map of CarDex's architecture, including the Data Objects and their relationships.  
-We chose to use an ID-based system to connect tables, layers, and (eventually) logic together.
+Below is the full map of CarDex's architecture, including the Data Objects, ENUM types, and their relationships.
+We chose to use an ID-based system (UUIDs) to connect tables, layers, and (eventually) logic together.
 
-> **NOTE**  
-> ClaudeAI was used to assist this markdown file. The Architecture diagram and actual data flow was wholly original.
+> **NOTE**
+> ChatGPT was used to assist in drafting, but the actual architecture diagrams and data flow are original.
+
+---
+
+## Core Data Objects
 
 <p align="center">
   <img src="../assets/arch_full.png" alt="Full Arch" width="800"/>
 </p>
 
-<p align="center">
-  <img src="../assets/arch_enums.png" alt="Full Arch" width="800"/>
-</p>
-
-## Core Data Objects
-
 ### USER
-*Application Users*
+
+*Users that will use the application*
 
 **Attributes:**
-| Name | Type | Description |
-|------|------|-------------|
-| id | uuid (PK) | Unique identifier for the user |
-| username | string | User's display name |
-| password | string | Authentication credential (should be hashed) |
-| currency | int | In-game currency balance for purchasing packs and cards |
-| owned_cards | reference (list) | Collection reference to all cards owned by the user |
-| owned_packs | reference (list) | Collection reference to all unopened packs |
-| open_trades | reference (list)  | Collection reference to active trade listings |
-| trade_history | reference (list) | Collection reference to completed trades |
+
+| Name          | Type             | Description                                  |
+| ------------- | ---------------- | -------------------------------------------- |
+| id            | uuid (PK)        | Unique identifier for the user               |
+| username      | string           | User's display name                          |
+| password      | string           | Authentication credential (should be hashed) |
+| currency      | int              | In-game currency balance                     |
+| owned_cards   | reference (list) | Cards owned by the user                      |
+| owned_packs   | reference (list) | Unopened packs owned by the user             |
+| open_trades   | reference (list) | Active trade listings created by the user    |
+| trade_history | reference (list) | Completed trades history                     |
 
 **Relationships:**
-- One user can own many cards (1:N with CARD)
-- One user can own many packs (1:N with PACK)
-- One user can create many open trades (1:N with OPEN_TRADE)
-- One user can be the seller in many completed trades (1:N with COMPLETED_TRADE)
-- One user can be the buyer in many completed trades (1:N with COMPLETED_TRADE)
-- One user can receive many rewards (1:N with REWARDS)
+
+* 1:N with **CARD**
+* 1:N with **PACK**
+* 1:N with **OPEN_TRADE**
+* 1:N with **COMPLETED_TRADE** (as buyer and seller)
+* 1:N with **REWARDS**
 
 ---
 
 ### VEHICLE
-*Meta object used to represent a CARD or PACK's context.*
+
+*Master vehicle metadata. Basis for cards and packs. Includes stats and other model information*
 
 **Attributes:**
-| Name | Type | Description |
-|------|------|-------------|
-| id | uuid (PK) | Unique identifier for the vehicle type |
-| year | string | Manufacturing year |
-| make | string | Vehicle manufacturer (e.g., Nissan, Toyota) |
-| model | string | Specific model name |
-| stat1 | int | Performance statistic (e.g., horsepower) |
-| stat2 | int | Performance statistic (e.g., speed) |
-| statN | int | Additional performance statistics (e.g., handling) |
-| value | int | Base value of the vehicle |
-| image | image | Visual representation of the vehicle |
+
+| Name  | Type      | Description                              |
+| ----- | --------- | ---------------------------------------- |
+| id    | uuid (PK) | Unique identifier for the vehicle        |
+| year  | string    | Manufacturing year                       |
+| make  | string    | Manufacturer (e.g., Nissan, Toyota)      |
+| model | string    | Model name                               |
+| stat1 | int       | Performance statistic (e.g., horsepower) |
+| stat2 | int       | Performance statistic (e.g., speed)      |
+| statN | int       | Other stats (e.g., handling)             |
+| value | int       | Base vehicle value                       |
+| image | image     | Vehicle artwork/image                    |
 
 **Relationships:**
-- One vehicle type can have many card instances (1:N with CARD)
-- Many vehicles belong to many collections (N:M through COLLECTION relationship)
 
-**Design Note:** The VEHICLE entity is the master data. When a user opens a pack and gets a card, the system creates a new CARD entity that references a VEHICLE and assigns it a grade.
+* 1:N with **CARD** (a vehicle can generate many card instances)
+* N:M with **COLLECTION** (vehicles belong to collections)
 
 ---
 
 ### CARD
-*An individual Card instance owned by a single USER. Each card is a specific instance of a VEHICLE with an assigned grade/rarity.*
+
+*An owned card instance, tied to a specific VEHICLE.*
 
 **Attributes:**
-| Name | Type | Description |
-|------|------|-------------|
-| id | uuid (PK) | Unique identifier for this specific card instance |
-| user_id | uuid (FK) | References the current owner |
-| vehicle_id | uuid (FK) | References the vehicle this card represents |
-| collection_id | uuid (FK) | References which collection this card came from |
-| grade | GRADE_ENUM | Rarity/quality tier of this specific card |
-| value | int | Current market value (may differ from base vehicle value based on grade) |
+
+| Name          | Type       | Description                |
+| ------------- | ---------- | -------------------------- |
+| id            | uuid (PK)  | Unique card instance ID    |
+| user_id       | uuid (FK)  | Current owner              |
+| vehicle_id    | uuid (FK)  | Vehicle metadata reference |
+| collection_id | uuid (FK)  | Collection origin          |
+| grade         | GRADE_ENUM | Card rarity/grade          |
+| value         | int        | Card’s trade value         |
 
 **Relationships:**
-- Each card belongs to exactly one user at a time (N:1 with USER)
-- Each card represents exactly one vehicle type (N:1 with VEHICLE)
-- Each card originated from one collection (N:1 with COLLECTION)
-- Cards can be listed in open trades (1:N with OPEN_TRADE)
-- Cards are involved in completed trades (1:N with COMPLETED_TRADE)
 
-**Grade System:**
-The GRADE_ENUM defines three rarity tiers:
-- `FACTORY`: Common/basic tier
-- `LIMITED_RUN`: Rare tier
-- `NISMO`: Legendary tier (highest rarity)
+* N:1 with **USER**
+* N:1 with **VEHICLE**
+* N:1 with **COLLECTION**
+* 1:N with **OPEN_TRADE**
+* 1:N with **COMPLETED_TRADE**
 
 ---
 
 ### PACK
-*An unopened pack that contains random cards when opened.*
+
+*Unopened randomized pool of cards from a collection.*
 
 **Attributes:**
-| Name | Type | Description |
-|------|------|-------------|
-| id | uuid (PK) | Unique identifier for this pack instance |
-| user_id | uuid (FK) | References the current owner |
-| collection_id | uuid (FK) | Determines which vehicles can be pulled from this pack |
-| value | int | The purchase/resale value of the pack |
+
+| Name          | Type      | Description             |
+| ------------- | --------- | ----------------------- |
+| id            | uuid (PK) | Unique pack instance ID |
+| user_id       | uuid (FK) | Current owner           |
+| collection_id | uuid (FK) | Determines vehicle pool |
+| value         | int       | Pack’s price/value      |
 
 **Relationships:**
-- Each pack belongs to exactly one user (N:1 with USER)
-- Each pack is associated with one collection (N:1 with COLLECTION)
-- Packs can be awarded through rewards (1:N with REWARDS)
+
+* N:1 with **USER**
+* N:1 with **COLLECTION**
+* 1:N with **REWARDS**
 
 **Lifecycle:**
-1. User purchases pack using currency (deducts from USER.currency)
-2. Pack is created and linked to user and a specific collection
-3. When user opens pack, it's deleted and random cards are generated based on the collection's vehicle pool
-4. Generated cards are assigned to the user with randomly determined grades
+
+1. Purchased with currency
+2. Added to user inventory
+3. When opened → deleted and generates new CARD instances
 
 ---
 
 ### COLLECTION
 
-Defines a themed set of vehicles and serves as the pool for pack openings.
+*Themed set of vehicles defining pack contents.*
 
 **Attributes:**
-| Name | Type | Description |
-|------|------|-------------|
-| id | uuid (PK) | Unique identifier for the collection |
-| vehicles | reference | Reference to all vehicles included in this collection |
-| name | string | Display name (e.g., "JDM Legends", "American Muscle") |
-| image | image | Collection artwork/banner |
-| pack_price | int | Cost in currency to purchase a pack from this collection |
+
+| Name       | Type      | Description                              |
+| ---------- | --------- | ---------------------------------------- |
+| id         | uuid (PK) | Collection ID                            |
+| vehicles   | reference | Vehicles inside this collection          |
+| name       | string    | Collection name                          |
+| image      | image     | Collection banner/image                  |
+| pack_price | int       | Price to buy a pack from this collection |
 
 **Relationships:**
-- One collection contains many vehicles (1:N with VEHICLE)
-- One collection determines the vehicle pool for many packs (1:N with PACK)
-- One collection is the source for many cards (1:N with CARD)
 
-**Purpose:** Collections organize vehicles into themed groups and control pack contents. When a user buys a pack from a specific collection, the cards they receive will only contain vehicles from that collection's pool.
+* 1:N with **VEHICLE**
+* 1:N with **PACK**
+* 1:N with **CARD**
 
 ---
 
@@ -147,78 +148,47 @@ Defines a themed set of vehicles and serves as the pool for pack openings.
 
 ### OPEN_TRADE
 
-Represents active trade listings created by users.
+*Active trade listing.*
 
 **Attributes:**
-| Name | Type | Description |
-|------|------|-------------|
-| id | uuid (PK) | Unique identifier for the trade listing |
-| type | TRADE_ENUM | Either FOR_CARD or FOR_PRICE |
-| user_id | uuid (FK) | References the user creating the trade (seller) |
-| card_id | uuid (FK) | The card being offered by the seller |
-| price | int | Currency price (for FOR_PRICE trades) |
-| want_card_id | uuid (FK, optional) | Specific card wanted (for FOR_CARD trades) |
+
+| Name         | Type                | Description                     |
+| ------------ | ------------------- | ------------------------------- |
+| id           | uuid (PK)           | Trade listing ID                |
+| type         | TRADE_ENUM          | FOR_CARD / FOR_PRICE            |
+| user_id      | uuid (FK)           | Seller                          |
+| card_id      | uuid (FK)           | Offered card                    |
+| price        | int                 | Currency price (FOR_PRICE)      |
+| want_card_id | uuid (FK, optional) | Specific card wanted (FOR_CARD) |
 
 **Relationships:**
-- Each trade is created by one user (N:1 with USER)
-- Each trade offers one card (N:1 with CARD)
-- Each trade may want a specific card (N:1 with CARD, optional)
 
-**Trade Types:**
-
-1. **FOR_PRICE**: Simple marketplace listing
-   - Seller lists their card with a price
-   - Any user with enough currency can buy it
-   - `want_card_id` is null
-   - Example: "Selling 1995 Skyline GT-R for 5000 currency"
-
-2. **FOR_CARD**: Card-for-card exchange
-   - Seller offers their card and specifies a specific card they want
-   - Only the owner of the wanted card can complete the trade
-   - `price` may still be used for currency adjustments if needed
-   - Example: "Trading my Supra for your NSX"
+* N:1 with **USER**
+* N:1 with **CARD**
 
 ---
 
 ### COMPLETED_TRADE
 
-Historical record of all executed trades.
+*Historical record of executed trades.*
 
 **Attributes:**
-| Name | Type | Description |
-|------|------|-------------|
-| id | uuid (PK) | Unique identifier for the trade record |
-| type | TRADE_ENUM | Either FOR_CARD or FOR_PRICE |
-| seller_user_id | uuid (FK) | User who offered the card |
-| seller_card_id | uuid (FK) | Card that was sold/traded |
-| buyer_user_id | uuid (FK) | User who accepted the trade |
-| buyer_card_id | uuid (FK, optional) | Card given in exchange (FOR_CARD trades only) |
-| executed_date | date | When the trade was completed |
-| price | int | Currency exchanged |
+
+| Name           | Type                | Description             |
+| -------------- | ------------------- | ----------------------- |
+| id             | uuid (PK)           | Completed trade ID      |
+| type           | TRADE_ENUM          | FOR_CARD / FOR_PRICE    |
+| seller_user_id | uuid (FK)           | Seller user             |
+| seller_card_id | uuid (FK)           | Seller’s card           |
+| buyer_user_id  | uuid (FK)           | Buyer user              |
+| buyer_card_id  | uuid (FK, optional) | Buyer’s card (FOR_CARD) |
+| executed_date  | date                | Trade completion date   |
+| price          | int                 | Trade currency          |
 
 **Relationships:**
-- Each completed trade has one seller (N:1 with USER)
-- Each completed trade has one buyer (N:1 with USER)
-- Each completed trade involves at least one card from seller (N:1 with CARD)
-- Each completed trade may involve a card from buyer (N:1 with CARD, optional)
 
-**Trade Execution Flow:**
-
-1. **FOR_PRICE Trade:**
-   - Buyer must have `price` amount in currency
-   - Transfer `price` currency from buyer to seller
-   - Transfer card ownership from seller to buyer
-   - Delete OPEN_TRADE record
-   - Create COMPLETED_TRADE record
-   - Create REWARDS entries for both users
-
-2. **FOR_CARD Trade:**
-   - Verify buyer owns the wanted card
-   - Swap card ownership
-   - Handle any currency adjustment via `price`
-   - Delete OPEN_TRADE record
-   - Create COMPLETED_TRADE record
-   - Create REWARDS entries for both users
+* N:1 with **USER** (buyer & seller)
+* N:1 with **CARD** (seller & optionally buyer)
 
 ---
 
@@ -226,43 +196,59 @@ Historical record of all executed trades.
 
 ### REWARDS
 
-Tracks rewards earned by users through various activities (trades, achievements, etc.).
+*Tracks claimable items/currency.*
 
 **Attributes:**
-| Name | Type | Description |
-|------|------|-------------|
-| id | uuid (PK) | Unique identifier for the reward |
-| user_id | uuid (FK) | User receiving the reward |
-| type | REWARD_ENUM | Type of reward |
-| item_id | uuid (FK, optional) | References PACK or CARD for item rewards |
-| amount | int (optional) | Quantity for currency rewards |
-| created_at | timestamp | When reward was earned |
-| claimed_at | timestamp (nullable) | When user claimed the reward (null if unclaimed) |
 
-**Relationships:**
-- Each reward belongs to one user (N:1 with USER)
-- Each reward may reference a pack (N:1 with PACK, optional)
-- Each reward may reference a card (N:1 with CARD, optional)
+| Name       | Type                 | Description            |
+| ---------- | -------------------- | ---------------------- |
+| id         | uuid (PK)            | Reward ID              |
+| user_id    | uuid (FK)            | Rewarded user          |
+| type       | REWARD_ENUM          | Reward type            |
+| item_id    | uuid (FK, optional)  | Pack or Card reference |
+| amount     | int (optional)       | Currency amount        |
+| created_at | timestamp            | Earned at              |
+| claimed_at | timestamp (nullable) | Claimed at             |
 
-**Reward Types:**
+**Reward Types (REWARD_ENUM):**
 
-1. **PACK**: User receives an unopened pack
-   - `item_id` references PACK.id
-   - User must claim to add pack to inventory
+* PACK → New pack
+* CURRENCY → Currency (non-trade)
+* CARD_FROM_TRADE → Card from trade
+* CURRENCY_FROM_TRADE → Currency from trade
 
-2. **CURRENCY**: Non-trade currency reward (achievements, daily bonuses, etc.)
-   - `amount` specifies currency quantity
-   - No `item_id` needed
+---
 
-3. **CARD_FROM_TRADE**: Card received from a completed trade
-   - `item_id` references CARD.id
-   - Tracks card changes from trades
 
-4. **CURRENCY_FROM_TRADE**: Currency received from a completed trade
-   - `amount` specifies currency quantity
-   - Tracks currency earned from selling cards
+## ENUM Data Types
 
-**Purpose:** The rewards system provides a unified inbox/notification system for all items users receive. This allows for deferred claiming, tracking of income sources, and potential future features like gifting or reward expiration.
+<p align="center">
+  <img src="../assets/arch_enums.png" alt="Arch Enums" width="800"/>
+</p>
+
+### TRADE_ENUM
+
+| Value         | Meaning                |
+| ------------- | ---------------------- |
+| **FOR_CARD**  | Trade for another card |
+| **FOR_PRICE** | Trade for currency     |
+
+### GRADE_ENUM
+
+| Value           | Meaning               |
+| --------------- | --------------------- |
+| **FACTORY**     | Basic/common rarity   |
+| **LIMITED_RUN** | Rare, limited edition |
+| **NISMO**       | Legendary rarity      |
+
+### REWARD_ENUM
+
+| Value                   | Meaning                               |
+| ----------------------- | ------------------------------------- |
+| **PACK**                | Pack reward                           |
+| **CURRENCY**            | Currency (non-trade) reward           |
+| **CARD_FROM_TRADE**     | Card earned from trade completion     |
+| **CURRENCY_FROM_TRADE** | Currency earned from trade completion |
 
 ---
 
@@ -270,97 +256,43 @@ Tracks rewards earned by users through various activities (trades, achievements,
 
 ### Purchasing a Pack
 
-1. User selects a collection and initiates purchase
-2. System verifies user has sufficient currency (USER.currency >= COLLECTION.pack_price)
-3. Deduct pack_price from USER.currency
-4. Create new PACK entity with user_id and collection_id
-5. Pack appears in user's inventory
+1. Verify user has enough currency
+2. Deduct COLLECTION.pack_price
+3. Create PACK with user_id & collection_id
+4. Add to user inventory
 
 ### Opening a Pack
 
-1. User selects a pack from their inventory
-2. System retrieves the pack's collection_id
-3. Query all VEHICLE entities in that collection
-4. Generate random cards (typically 3-5):
-   - Randomly select vehicles from collection pool
-   - Randomly assign grades based on rarity weights
-   - Create CARD entities with user_id, vehicle_id, collection_id, and grade
-5. Delete the PACK entity
-6. Display new cards to user
+1. Retrieve vehicles from COLLECTION
+2. Generate random cards w/ grades
+3. Create CARD instances
+4. Delete PACK
 
-### Creating a Trade (FOR_PRICE)
+### Completing Trades
 
-1. User selects a card from their collection
-2. User sets a price
-3. Create OPEN_TRADE with type=FOR_PRICE, card_id, price
-4. Trade appears in marketplace for other users
-
-### Completing a Trade (FOR_PRICE)
-
-1. Buyer views open trade and clicks buy
-2. Verify buyer has sufficient currency
-3. Transfer currency: buyer.currency -= price, seller.currency += price
-4. Transfer card: card.user_id = buyer_id
-5. Create COMPLETED_TRADE record
-6. Create REWARDS entry (type=CARD_FROM_TRADE) for buyer
-7. Create REWARDS entry (type=CURRENCY_FROM_TRADE) for seller
-8. Delete OPEN_TRADE
-
-### Creating a Trade (FOR_CARD)
-
-1. User selects a card they own
-2. User specifies a specific card they want (by searching or browsing)
-3. Create OPEN_TRADE with type=FOR_CARD, card_id, want_card_id
-4. Only the owner of want_card_id can see and accept this trade
-
-### Completing a Trade (FOR_CARD)
-
-1. Owner of wanted card accepts trade
-2. Swap card ownership:
-   - seller_card.user_id = buyer_id
-   - buyer_card.user_id = seller_id
-3. Create COMPLETED_TRADE record
-4. Create REWARDS entries for both users (type=CARD_FROM_TRADE)
-5. Delete OPEN_TRADE
+* **FOR_PRICE:** Currency exchanged, card ownership transferred
+* **FOR_CARD:** Card-for-card swap
+* In both: OPEN_TRADE deleted, COMPLETED_TRADE + REWARDS created
 
 ---
 
-## Design Considerations
+## Design Notes
 
-### Scalability
-- All primary keys use UUIDs for distributed system compatibility
-- Completed trades are archived separately from open trades for query performance
-- Indexes should be added on foreign keys (user_id, vehicle_id, collection_id)
-
-### Data Integrity
-- Card ownership is atomic (each card has exactly one owner)
-- Trades are transactional (all changes succeed or all fail)
-- Currency balance must never go negative
-- Packs are deleted when opened (prevents duplicate card generation)
-
-### Future Enhancements
-- Add `inventory_count` to VEHICLE for limited availability
-- Add `trade_locked` boolean to CARD for preventing certain cards from being traded
-- Add `expires_at` to REWARDS for time-limited rewards
-- Add `daily_reward_claimed_at` to USER for daily login bonuses
-- Consider adding AUCTION table for timed bidding system
-
-### Security Notes
-- USER.password should be hashed (bcrypt, argon2)
-- Trade completion should use database transactions
-- Validate all currency operations to prevent exploitation
-- Implement rate limiting on pack purchases and trade creation
+* **Scalability:** UUIDs for distributed use, separate active vs completed trades.
+* **Integrity:** Atomic ownership, transactional trades, currency never negative.
+* **Security:** Hash passwords, validate transactions, rate-limit actions.
+* **Future Enhancements:** Auctions, limited supply vehicles, reward expiration, daily login bonuses.
 
 ---
 
-## Summary
+# Summary
 
-This architecture supports a full-featured trading card game with:
-- ✅ Pack purchasing and opening mechanics
-- ✅ Card ownership and grading system
-- ✅ Multiple trade types (currency and card-for-card)
-- ✅ Complete trade history tracking
-- ✅ Unified rewards/inbox system
-- ✅ Scalable collection-based content organization
+CarDex supports:
 
-The schema is normalized and uses clear relationships to maintain data integrity while supporting complex trading mechanics.
+* Pack purchasing/opening
+* Card rarity system
+* Currency & card-for-card trades
+* Trade history tracking
+* Unified rewards inbox
+* ENUMs for consistent trade, reward, and grade typing
+* Scalable collection-based content
