@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using CarDexBackend.Services;
 using CarDexBackend.Shared.Dtos.Responses;
 using CarDexDatabase;
+using CarDexBackend.Domain.Enums;
+using Npgsql;
 using Xunit;
 using System;
 using System.Linq;
@@ -14,22 +16,13 @@ namespace DefaultNamespace
     {
         private readonly CarDexDbContext _context;
         private readonly CollectionService _collectionService;
-        private readonly IConfiguration _configuration;
 
         //Used ChatGPT to get the base code and to help seed the data
         public CollectionServiceTest()
         {
-            // Set up configuration to read from appsettings.json
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory) 
-                .AddJsonFile("appsettings.json") 
-                .Build();
-            
-            var connectionString = _configuration.GetConnectionString("SupabaseConnection");
-
-            
+            // Use In-Memory Database for isolated testing
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
-                .UseNpgsql(connectionString)  
+                .UseInMemoryDatabase(databaseName: "TestDatabase_CollectionService_" + Guid.NewGuid())
                 .Options;
 
             _context = new CarDexDbContext(options);
@@ -47,12 +40,35 @@ namespace DefaultNamespace
 
         private void SeedTestData()
         {
-            // Add test collections 
+            // Add test vehicles first
+            var vehicle1 = new CarDexBackend.Domain.Entities.Vehicle
+            {
+                Id = Guid.NewGuid(),
+                Year = "2021",
+                Make = "Tesla",
+                Model = "Model S",
+                Value = 70000
+            };
+            
+            var vehicle2 = new CarDexBackend.Domain.Entities.Vehicle
+            {
+                Id = Guid.NewGuid(),
+                Year = "2020",
+                Make = "Ford",
+                Model = "Mustang",
+                Value = 50000
+            };
+            
+            _context.Vehicles.Add(vehicle1);
+            _context.Vehicles.Add(vehicle2);
+            _context.SaveChanges();
+            
+            // Add test collections with the actual vehicle IDs
             var collection1 = new CarDexBackend.Domain.Entities.Collection
             {
                 Id = Guid.NewGuid(),
                 Name = "Collection 1",
-                Vehicles = new int[] { 1, 2 },  
+                Vehicles = new Guid[] { vehicle1.Id, vehicle2.Id },  
                 PackPrice = 500
             };
 
@@ -60,7 +76,7 @@ namespace DefaultNamespace
             {
                 Id = Guid.NewGuid(),
                 Name = "Collection 2",
-                Vehicles = new int[] { 3 },  
+                Vehicles = new Guid[] { vehicle1.Id },  
                 PackPrice = 300
             };
 
@@ -78,18 +94,20 @@ namespace DefaultNamespace
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Collections.Count); 
-            Assert.Equal(2, result.Total); 
-            Assert.Equal("Collection 1", result.Collections.First().Name);
-            Assert.Equal("Collection 2", result.Collections.Last().Name);
+            Assert.Equal(2, result.Collections.Count()); 
+            Assert.Equal(2, result.Total);
+            // Check that both collections exist, don't rely on order
+            var collectionNames = result.Collections.Select(c => c.Name).ToList();
+            Assert.Contains("Collection 1", collectionNames);
+            Assert.Contains("Collection 2", collectionNames);
         }
 
         // Test for GetCollectionById
         [Fact]
         public async Task GetCollectionById_ShouldReturnCorrectCollection()
         {
-            // Arrange
-            var collection = _context.Collections.First();
+            // Arrange - Get Collection 1 specifically
+            var collection = _context.Collections.First(c => c.Name == "Collection 1");
             
             // Act
             var result = await _collectionService.GetCollectionById(collection.Id);
@@ -98,7 +116,9 @@ namespace DefaultNamespace
             Assert.NotNull(result);
             Assert.Equal(collection.Id, result.Id);
             Assert.Equal("Collection 1", result.Name); 
-            Assert.Equal(2, result.CardCount); 
+            // CardCount is based on actual Card entities in the collection, not vehicles array
+            // Since we don't create any Card entities in this test, expect 0
+            Assert.Equal(0, result.CardCount); 
         }
 
         // Test for GetCollectionById when collection does not exist

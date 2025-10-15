@@ -2,7 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using CarDexBackend.Services;
 using CarDexBackend.Shared.Dtos.Responses;
+using CarDexBackend.Shared.Dtos.Requests;
 using CarDexDatabase;
+using CarDexBackend.Domain.Enums;
+using Npgsql;
 using Xunit;
 using System;
 using System.Linq;
@@ -14,21 +17,13 @@ namespace DefaultNamespace
     {
         private readonly CarDexDbContext _context;
         private readonly TradeService _tradeService;
-        private readonly IConfiguration _configuration;
 
         //Used ChatGPT to get the base code and get help seeding the data, and to write the test for GetOpenTrade with filters.
         public TradeServiceTest()
         {
-            // Set up configuration to read from appsettings.json
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory) 
-                .AddJsonFile("appsettings.json") 
-                .Build();
-
-            var connectionString = _configuration.GetConnectionString("SupabaseConnection");
-            L
+            // Use In-Memory Database for isolated testing
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
-                .UseNpgsql(connectionString)  
+                .UseInMemoryDatabase(databaseName: "TestDatabase_TradeService_" + Guid.NewGuid())
                 .Options;
 
             _context = new CarDexDbContext(options);
@@ -51,7 +46,7 @@ namespace DefaultNamespace
             {
                 Id = Guid.NewGuid(),
                 Name = "Collection 1",
-                Vehicles = new int[] { 1, 2 },  
+                Vehicles = new Guid[] { Guid.NewGuid(), Guid.NewGuid() },  
                 PackPrice = 500
             };
 
@@ -59,7 +54,7 @@ namespace DefaultNamespace
             {
                 Id = Guid.NewGuid(),
                 Name = "Collection 2",
-                Vehicles = new int[] { 3 },  
+                Vehicles = new Guid[] { Guid.NewGuid() },  
                 PackPrice = 300
             };
 
@@ -91,7 +86,7 @@ namespace DefaultNamespace
             // Add test vehicles
             var vehicle1 = new CarDexBackend.Domain.Entities.Vehicle
             {
-                Id = 1, 
+                Id = Guid.NewGuid(), 
                 Year = "2021",
                 Make = "Tesla",
                 Model = "Model S",
@@ -100,7 +95,7 @@ namespace DefaultNamespace
 
             var vehicle2 = new CarDexBackend.Domain.Entities.Vehicle
             {
-                Id = 2,
+                Id = Guid.NewGuid(),
                 Year = "2020",
                 Make = "Ford",
                 Model = "Mustang",
@@ -109,7 +104,7 @@ namespace DefaultNamespace
 
             var vehicle3 = new CarDexBackend.Domain.Entities.Vehicle
             {
-                Id = 3,
+                Id = Guid.NewGuid(),
                 Year = "2022",
                 Make = "Chevrolet",
                 Model = "Camaro",
@@ -145,15 +140,47 @@ namespace DefaultNamespace
             _context.Cards.Add(card1);
             _context.Cards.Add(card2);
             _context.SaveChanges();
+            
+            // Add card for test service user (used by CreateTrade test)
+            var testUserId = Guid.Parse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
+            var testUserCard = new CarDexBackend.Domain.Entities.Card
+            {
+                Id = Guid.NewGuid(),
+                UserId = testUserId,
+                VehicleId = vehicle3.Id,
+                CollectionId = collection1.Id,
+                Grade = GradeEnum.FACTORY,
+                Value = 60000
+            };
+            _context.Cards.Add(testUserCard);
+            _context.SaveChanges();
         }
 
         // Test for CreateTrade
         [Fact]
         public async Task CreateTrade_ShouldCreateTradeSuccessfully()
         {
-            // Arrange
-            var user = _context.Users.First();
-            var card = _context.Cards.First();
+            // Arrange - Create a card owned by the test user (TradeService uses hardcoded test user)
+            var testUserId = Guid.Parse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
+            
+            // Create or get the test user
+            var testUser = _context.Users.FirstOrDefault(u => u.Id == testUserId);
+            if (testUser == null)
+            {
+                testUser = new CarDexBackend.Domain.Entities.User
+                {
+                    Id = testUserId,
+                    Username = "TestServiceUser",
+                    Password = "Password123",
+                    Currency = 1000
+                };
+                _context.Users.Add(testUser);
+                _context.SaveChanges();
+            }
+            
+            // Get a card owned by the test user
+            var card = _context.Cards.First(c => c.UserId == testUserId);
+            
             var request = new TradeCreateRequest
             {
                 CardId = card.Id,
@@ -168,15 +195,49 @@ namespace DefaultNamespace
             Assert.NotNull(result);
             Assert.Equal(card.Id, result.CardId); 
             Assert.Equal(request.Price, result.Price); 
-            Assert.Equal(user.Username, result.Username); 
+            Assert.Equal(testUser.Username, result.Username); 
         }
 
         // Test for GetOpenTrades with filters
         [Fact]
         public async Task GetOpenTrades_ShouldReturnFilteredOpenTrades()
         {
-            // Arrange
-            var collectionId = _context.Collections.First().Id;
+            // Arrange - Create an open trade first
+            var user = _context.Users.First();
+            
+            // Find a FACTORY card to use
+            var factoryCard = _context.Cards.FirstOrDefault(c => c.UserId == user.Id && c.Grade == GradeEnum.FACTORY);
+            if (factoryCard == null)
+            {
+                // Create a FACTORY card if none exists
+                var vehicle = _context.Vehicles.First();
+                var collection = _context.Collections.First();
+                factoryCard = new CarDexBackend.Domain.Entities.Card
+                {
+                    Id = Guid.NewGuid(),
+                    UserId = user.Id,
+                    VehicleId = vehicle.Id,
+                    CollectionId = collection.Id,
+                    Grade = GradeEnum.FACTORY,
+                    Value = 50000
+                };
+                _context.Cards.Add(factoryCard);
+                _context.SaveChanges();
+            }
+            
+            var collectionId = factoryCard.CollectionId;
+            
+            var openTrade = new CarDexBackend.Domain.Entities.OpenTrade(
+                Guid.NewGuid(),
+                TradeEnum.FOR_PRICE,
+                user.Id,
+                factoryCard.Id,
+                1000,
+                null
+            );
+            _context.OpenTrades.Add(openTrade);
+            _context.SaveChanges();
+            
             var grade = "FACTORY"; 
             var minPrice = 500;
 
@@ -205,37 +266,84 @@ namespace DefaultNamespace
         [Fact]
         public async Task GetOpenTradeById_ShouldReturnCorrectTradeDetails()
         {
-            // Arrange
-            var tradeId = _context.OpenTrades.First().Id;
+            // Arrange - Create an open trade
+            var user = _context.Users.First();
+            var card = _context.Cards.First(c => c.UserId == user.Id);
+            
+            var openTrade = new CarDexBackend.Domain.Entities.OpenTrade(
+                Guid.NewGuid(),
+                TradeEnum.FOR_PRICE,
+                user.Id,
+                card.Id,
+                1000,
+                null
+            );
+            _context.OpenTrades.Add(openTrade);
+            _context.SaveChanges();
 
             // Act
-            var result = await _tradeService.GetOpenTradeById(tradeId);
+            var result = await _tradeService.GetOpenTradeById(openTrade.Id);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(tradeId, result.Id);
-            Assert.Equal("TestUser1", result.Username); 
+            Assert.Equal(openTrade.Id, result.Id);
+            Assert.Equal(user.Username, result.Username); 
         }
 
         // Test for ExecuteTrade
         [Fact]
         public async Task ExecuteTrade_ShouldCompleteTheTradeAndTransferCurrency()
         {
-            // Arrange
-            var trade = _context.OpenTrades.First();
+            // Arrange - Create buyer (test user) with enough currency
+            var testUserId = Guid.Parse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
+            var buyer = _context.Users.FirstOrDefault(u => u.Id == testUserId);
+            if (buyer == null)
+            {
+                buyer = new CarDexBackend.Domain.Entities.User
+                {
+                    Id = testUserId,
+                    Username = "BuyerUser",
+                    Password = "Password123",
+                    Currency = 5000 // Enough to buy
+                };
+                _context.Users.Add(buyer);
+                _context.SaveChanges();
+            }
+            else
+            {
+                buyer.Currency = 5000; // Ensure enough currency
+                _context.SaveChanges();
+            }
+            
+            // Create seller and their card
+            var seller = _context.Users.First(u => u.Id != testUserId);
+            var sellerCard = _context.Cards.First(c => c.UserId == seller.Id);
+            
+            // Create open trade
+            var openTrade = new CarDexBackend.Domain.Entities.OpenTrade(
+                Guid.NewGuid(),
+                TradeEnum.FOR_PRICE,
+                seller.Id,
+                sellerCard.Id,
+                1000,
+                null
+            );
+            _context.OpenTrades.Add(openTrade);
+            _context.SaveChanges();
+            
             var request = new TradeExecuteRequest
             {
-                BuyerCardId = _context.Cards.First().Id 
+                BuyerCardId = null // FOR_PRICE trade doesn't need buyer card
             };
 
             // Act
-            var result = await _tradeService.ExecuteTrade(trade.Id, request);
+            var result = await _tradeService.ExecuteTrade(openTrade.Id, request);
 
             // Assert
             Assert.NotNull(result.CompletedTrade);
             Assert.True(result.CompletedTrade.Price > 0); 
-            Assert.Equal(trade.UserId, result.CompletedTrade.SellerUserId); 
-            Assert.NotEqual(trade.UserId, result.CompletedTrade.BuyerUserId); 
+            Assert.Equal(seller.Id, result.CompletedTrade.SellerUserId); 
+            Assert.Equal(buyer.Id, result.CompletedTrade.BuyerUserId); 
         }
     }
 }

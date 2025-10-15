@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using CarDexBackend.Services;
 using CarDexBackend.Shared.Dtos.Responses;
 using CarDexDatabase;
+using CarDexBackend.Domain.Enums;
+using Npgsql;
 using Xunit;
 using System;
 using System.Linq;
@@ -14,22 +16,14 @@ namespace DefaultNamespace
     {
         private readonly CarDexDbContext _context;
         private readonly CardService _cardService;
-        private readonly IConfiguration _configuration;
 
         //Used ChatGPT to set up the base code, help with seeding the data and modify the code for the test
         //for getallcards with filters and sorting
         public CardServiceTest()
         {
-            // Set up configuration to read from appsettings.json
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory) 
-                .AddJsonFile("appsettings.json") 
-                .Build();
-
-            var connectionString = _configuration.GetConnectionString("SupabaseConnection");
-            
+            // Use In-Memory Database for isolated testing
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
-                .UseNpgsql(connectionString)  
+                .UseInMemoryDatabase(databaseName: "TestDatabase_CardService_" + Guid.NewGuid())
                 .Options;
 
             _context = new CarDexDbContext(options);
@@ -79,7 +73,7 @@ namespace DefaultNamespace
                 UserId = Guid.NewGuid(),
                 VehicleId = vehicle1.Id,
                 CollectionId = Guid.NewGuid(),
-                Grade = CarDexBackend.Domain.Enums.GradeEnum.A,
+                Grade = CarDexBackend.Domain.Enums.GradeEnum.FACTORY,
                 Value = 70000,
                 
             };
@@ -90,7 +84,7 @@ namespace DefaultNamespace
                 UserId = Guid.NewGuid(),
                 VehicleId = vehicle2.Id,
                 CollectionId = Guid.NewGuid(),
-                Grade = CarDexBackend.Domain.Enums.GradeEnum.B,
+                Grade = CarDexBackend.Domain.Enums.GradeEnum.LIMITED_RUN,
                 Value = 50000,
                 
             };
@@ -109,28 +103,31 @@ namespace DefaultNamespace
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Cards.Count); 
+            Assert.Equal(2, result.Cards.Count()); 
             Assert.Equal(2, result.Total); 
-            Assert.Equal("2021 Tesla Model S", result.Cards.First().Name);
-            Assert.Equal("2020 Ford Mustang", result.Cards.Last().Name);
+            // Check cards exist, don't rely on specific order
+            var cardNames = result.Cards.Select(c => c.Name).ToList();
+            Assert.Contains("2021 Tesla Model S", cardNames);
+            Assert.Contains("2020 Ford Mustang", cardNames);
         }
 
         // Test for GetCardById
         [Fact]
         public async Task GetCardById_ShouldReturnCorrectCard()
         {
-            // Arrange
-            var card = _context.Cards.First();
+            // Arrange - Get the Tesla card specifically
+            var teslaVehicle = _context.Vehicles.First(v => v.Make == "Tesla");
+            var teslaCard = _context.Cards.First(c => c.VehicleId == teslaVehicle.Id);
             
             // Act
-            var result = await _cardService.GetCardById(card.Id);
+            var result = await _cardService.GetCardById(teslaCard.Id);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(card.Id, result.Id);
+            Assert.Equal(teslaCard.Id, result.Id);
             Assert.Equal("2021 Tesla Model S", result.Name);
-            Assert.Equal(card.Grade.ToString(), result.Grade);
-            Assert.Equal(card.Value, result.Value);
+            Assert.Equal(teslaCard.Grade.ToString(), result.Grade);
+            Assert.Equal(teslaCard.Value, result.Value);
         }
 
         // Test for GetAllCards with filters
@@ -138,7 +135,7 @@ namespace DefaultNamespace
         public async Task GetAllCards_WithFilters_ShouldReturnFilteredCards()
         {
             // Act: Filter by grade
-            var result = await _cardService.GetAllCards(grade: "A", limit: 10, offset: 0);
+            var result = await _cardService.GetAllCards(grade: "FACTORY", limit: 10, offset: 0);
 
             // Assert: Only one card should be returned (Tesla Model S)
             Assert.NotNull(result);
@@ -155,7 +152,7 @@ namespace DefaultNamespace
 
             // Assert: The first card should be the one with the higher value
             Assert.NotNull(result);
-            Assert.Equal(2, result.Cards.Count);
+            Assert.Equal(2, result.Cards.Count());
             Assert.Equal("2021 Tesla Model S", result.Cards.First().Name);
             Assert.Equal("2020 Ford Mustang", result.Cards.Last().Name);
         }

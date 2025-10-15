@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using CarDexBackend.Services;
 using CarDexBackend.Shared.Dtos.Responses;
 using CarDexDatabase;
+using CarDexBackend.Domain.Enums;
+using Npgsql;
 using Xunit;
 using System;
 using System.Linq;
@@ -18,23 +20,12 @@ namespace DefaultNamespace
         //Used ChatGPT to set up the base code
         public UserServiceTest()
         {
-            // Set up configuration to read from appsettings.json
-            var configuration = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory) 
-                .AddJsonFile("appsettings.json") 
-                .Build();
-            
-            var connectionString = configuration.GetConnectionString("SupabaseConnection");
-
+            // Use In-Memory Database for isolated testing
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
-                .UseNpgsql(connectionString)  g
+                .UseInMemoryDatabase(databaseName: "TestDatabase_UserService_" + Guid.NewGuid())
                 .Options;
 
             _context = new CarDexDbContext(options);
-
-            // Ensure that the database is up to date with the latest schema
-            _context.Database.Migrate();  
-
             _userService = new UserService(_context);
         }
 
@@ -159,7 +150,7 @@ namespace DefaultNamespace
             {
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
-                Type = CarDexBackend.Domain.Enums.TradeEnum.ForCard,
+                Type = CarDexBackend.Domain.Enums.TradeEnum.FOR_CARD,
                 CardId = Guid.NewGuid(),
                 Price = 500,
             };
@@ -169,13 +160,13 @@ namespace DefaultNamespace
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _userService.GetUserTrades(user.Id, "ForCard");
+            var result = await _userService.GetUserTrades(user.Id, "FOR_CARD");
 
             // Assert
             Assert.NotNull(result);
             Assert.Single(result.Trades);
             Assert.Equal(trade.Id, result.Trades.First().Id);
-            Assert.Equal(trade.Type, (CarDexBackend.Shared.Dtos.UserTradeType)Enum.Parse(typeof(CarDexBackend.Shared.Dtos.UserTradeType), result.Trades.First().Type));
+            Assert.Equal(trade.Type.ToString(), result.Trades.First().Type);
             Assert.Equal(trade.Price, result.Trades.First().Price);
         }
 
@@ -231,9 +222,9 @@ namespace DefaultNamespace
             {
                 Id = Guid.NewGuid(),
                 UserId = user.Id,
-                Type = CarDexBackend.Domain.Enums.RewardEnum.Pack,
-                ItemId = 1,
-                CreatedAt = DateTime.UtcNow,
+                Type = CarDexBackend.Domain.Enums.RewardEnum.PACK,
+                ItemId = Guid.NewGuid(),
+                Amount = 1,
                 ClaimedAt = null 
             };
 

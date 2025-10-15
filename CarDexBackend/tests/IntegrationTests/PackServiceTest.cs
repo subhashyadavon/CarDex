@@ -2,7 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using CarDexBackend.Services;
 using CarDexBackend.Shared.Dtos.Responses;
+using CarDexBackend.Shared.Dtos.Requests;
 using CarDexDatabase;
+using CarDexBackend.Domain.Enums;
+using Npgsql;
 using Xunit;
 using System;
 using System.Linq;
@@ -14,21 +17,13 @@ namespace DefaultNamespace
     {
         private readonly CarDexDbContext _context;
         private readonly PackService _packService;
-        private readonly IConfiguration _configuration;
 
         //Used ChatGPT to get the base code and to get help seeding the data
         public PackServiceTest()
         {
-            // Set up configuration to read from appsettings.json
-            _configuration = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory) 
-                .AddJsonFile("appsettings.json") 
-                .Build();
-
-            var connectionString = _configuration.GetConnectionString("SupabaseConnection");
-
+            // Use In-Memory Database for isolated testing
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
-                .UseNpgsql(connectionString)  
+                .UseInMemoryDatabase(databaseName: "TestDatabase_PackService_" + Guid.NewGuid())
                 .Options;
 
             _context = new CarDexDbContext(options);
@@ -46,43 +41,10 @@ namespace DefaultNamespace
 
         private void SeedTestData()
         {
-            // Add test collections 
-            var collection1 = new CarDexBackend.Domain.Entities.Collection
-            {
-                Id = Guid.NewGuid(),
-                Name = "Collection 1",
-                Vehicles = new int[] { 1, 2 },  
-                PackPrice = 500
-            };
-
-            var collection2 = new CarDexBackend.Domain.Entities.Collection
-            {
-                Id = Guid.NewGuid(),
-                Name = "Collection 2",
-                Vehicles = new int[] { 3 },  
-                PackPrice = 300
-            };
-
-            _context.Collections.Add(collection1);
-            _context.Collections.Add(collection2);
-            _context.SaveChanges();
-
-            // Add test users
-            var user1 = new CarDexBackend.Domain.Entities.User
-            {
-                Id = Guid.NewGuid(),
-                Username = "TestUser",
-                Password = "Password123",
-                Currency = 1000 
-            };
-
-            _context.Users.Add(user1);
-            _context.SaveChanges();
-
-            // Add test vehicles
+            // Add test vehicles first
             var vehicle1 = new CarDexBackend.Domain.Entities.Vehicle
             {
-                Id = 1, 
+                Id = Guid.NewGuid(), 
                 Year = "2021",
                 Make = "Tesla",
                 Model = "Model S",
@@ -91,7 +53,7 @@ namespace DefaultNamespace
 
             var vehicle2 = new CarDexBackend.Domain.Entities.Vehicle
             {
-                Id = 2,
+                Id = Guid.NewGuid(),
                 Year = "2020",
                 Make = "Ford",
                 Model = "Mustang",
@@ -100,7 +62,7 @@ namespace DefaultNamespace
 
             var vehicle3 = new CarDexBackend.Domain.Entities.Vehicle
             {
-                Id = 3,
+                Id = Guid.NewGuid(),
                 Year = "2022",
                 Make = "Chevrolet",
                 Model = "Camaro",
@@ -111,6 +73,40 @@ namespace DefaultNamespace
             _context.Vehicles.Add(vehicle2);
             _context.Vehicles.Add(vehicle3);
             _context.SaveChanges();
+            
+            // Add test collections with actual vehicle IDs
+            var collection1 = new CarDexBackend.Domain.Entities.Collection
+            {
+                Id = Guid.NewGuid(),
+                Name = "Collection 1",
+                Vehicles = new Guid[] { vehicle1.Id, vehicle2.Id, vehicle3.Id },  
+                PackPrice = 500
+            };
+
+            var collection2 = new CarDexBackend.Domain.Entities.Collection
+            {
+                Id = Guid.NewGuid(),
+                Name = "Collection 2",
+                Vehicles = new Guid[] { vehicle1.Id },  
+                PackPrice = 300
+            };
+
+            _context.Collections.Add(collection1);
+            _context.Collections.Add(collection2);
+            _context.SaveChanges();
+
+            // Add test users including the hardcoded test user from PackService
+            var testUserId = Guid.Parse("a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11");
+            var user1 = new CarDexBackend.Domain.Entities.User
+            {
+                Id = testUserId,
+                Username = "TestUser",
+                Password = "Password123",
+                Currency = 1000 
+            };
+
+            _context.Users.Add(user1);
+            _context.SaveChanges();
         }
 
         // Test for PurchasePack
@@ -120,6 +116,7 @@ namespace DefaultNamespace
             // Arrange
             var collection = _context.Collections.First();
             var user = _context.Users.First();
+            var initialCurrency = user.Currency;
 
             var request = new PackPurchaseRequest
             {
@@ -131,7 +128,7 @@ namespace DefaultNamespace
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(user.Currency - collection.PackPrice, result.UserCurrency); 
+            Assert.Equal(initialCurrency - collection.PackPrice, result.UserCurrency); 
             Assert.Equal(collection.Id, result.Pack.CollectionId); 
         }
 
@@ -139,11 +136,14 @@ namespace DefaultNamespace
         [Fact]
         public async Task GetPackById_ShouldReturnCorrectPackDetails()
         {
-            // Arrange
+            // Arrange - Create pack with Collection 1 which has 3 vehicles
+            var collection = _context.Collections.First(c => c.Name == "Collection 1");
+            var user = _context.Users.First();
+            
             var pack = new CarDexBackend.Domain.Entities.Pack(
                 Guid.NewGuid(),
-                Guid.NewGuid(),
-                Guid.NewGuid(),
+                user.Id,
+                collection.Id,
                 500); 
             _context.Packs.Add(pack);
             _context.SaveChanges();
@@ -154,20 +154,23 @@ namespace DefaultNamespace
             // Assert
             Assert.NotNull(result);
             Assert.Equal(pack.Id, result.Id);
-            Assert.Equal(3, result.PreviewCards.Count); 
+            Assert.Equal(3, result.PreviewCards.Count()); 
             Assert.Equal(pack.CollectionId, result.CollectionId); 
-            Assert.Equal(false, result.IsOpened); 
+            Assert.False(result.IsOpened); 
         }
 
         // Test for OpenPack
         [Fact]
         public async Task OpenPack_ShouldGenerateCardsAndRemovePack()
         {
-            // Arrange
+            // Arrange - Create pack with existing collection and user
+            var collection = _context.Collections.First();
+            var user = _context.Users.First();
+            
             var pack = new CarDexBackend.Domain.Entities.Pack(
                 Guid.NewGuid(),
-                Guid.NewGuid(),
-                Guid.NewGuid(),
+                user.Id,
+                collection.Id,
                 500); 
             _context.Packs.Add(pack);
             _context.SaveChanges();
@@ -177,8 +180,8 @@ namespace DefaultNamespace
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(5, result.Cards.Count); 
-            Assert.Equal(true, result.Pack.IsOpened); 
+            Assert.Equal(5, result.Cards.Count()); 
+            Assert.True(result.Pack.IsOpened); 
             Assert.DoesNotContain(pack, _context.Packs); 
         }
     }
