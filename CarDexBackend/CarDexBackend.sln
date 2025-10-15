@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Dtos", "Share
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Services", "CarDexBackend.Services\CarDexBackend.Services.csproj", "{534ED8B4-0517-42C0-AD54-FEC582EA70C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.API", "CarDexBackend.API\CarDexBackend.API.csproj", "{18E155AA-22BA-41B9-8D78-5A90FDC78DCB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Api", "CarDexBackend.Api\CarDexBackend.Api.csproj", "{18E155AA-22BA-41B9-8D78-5A90FDC78DCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
