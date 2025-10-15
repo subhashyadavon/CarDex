@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.API", "CarDex
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{D2CA6B12-200E-317A-40BC-1837600FF404}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTests", "tests\IntegrationTests\IntegrationTests\IntegrationTests.csproj", "{9D7E9C16-9DFB-4DEF-B2A5-AB573678702B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.IntegrationTests", "tests\IntegrationTests\CarDexBackend.IntegrationTests.csproj", "{9D7E9C16-9DFB-4DEF-B2A5-AB573678702B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
