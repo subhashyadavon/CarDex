@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Dtos", "Share
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Services", "CarDexBackend.Services\CarDexBackend.Services.csproj", "{534ED8B4-0517-42C0-AD54-FEC582EA70C7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Controller", "CarDexBackend.Controller\CarDexBackend.Controller.csproj", "{A77FFCC3-9543-44F3-AEE0-4871F6DFC33F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.API", "CarDexBackend.API\CarDexBackend.API.csproj", "{18E155AA-22BA-41B9-8D78-5A90FDC78DCB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -44,10 +44,10 @@ Global
 		{534ED8B4-0517-42C0-AD54-FEC582EA70C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{534ED8B4-0517-42C0-AD54-FEC582EA70C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{534ED8B4-0517-42C0-AD54-FEC582EA70C7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A77FFCC3-9543-44F3-AEE0-4871F6DFC33F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A77FFCC3-9543-44F3-AEE0-4871F6DFC33F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A77FFCC3-9543-44F3-AEE0-4871F6DFC33F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A77FFCC3-9543-44F3-AEE0-4871F6DFC33F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18E155AA-22BA-41B9-8D78-5A90FDC78DCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18E155AA-22BA-41B9-8D78-5A90FDC78DCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18E155AA-22BA-41B9-8D78-5A90FDC78DCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18E155AA-22BA-41B9-8D78-5A90FDC78DCB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AD39CCD6-447C-4DFD-AAE2-D1F845F87759} = {684A4178-D55D-4F5F-B766-0F524D9FED58}
