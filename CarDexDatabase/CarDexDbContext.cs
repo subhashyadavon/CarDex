@@ -49,13 +49,13 @@ namespace CarDexDatabase
                     .HasColumnName("currency")
                     .HasDefaultValue(0);
                 
-                entity.Property(e => e.CreatedAt)
+                /*entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
                 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
                 // Ignore navigation properties (we'll handle arrays differently or skip them)
                 entity.Ignore(e => e.OwnedCards);
@@ -95,13 +95,13 @@ namespace CarDexDatabase
                     .HasColumnName("value")
                     .HasDefaultValue(0);
                 
-                entity.Property(e => e.CreatedAt)
+                /*entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
                 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
                 // Foreign keys
                 entity.HasOne<User>()
@@ -165,13 +165,13 @@ namespace CarDexDatabase
                     .HasColumnName("image")
                     .HasColumnType("text");
                 
-                entity.Property(e => e.CreatedAt)
+                /*entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
                 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
             });
 
             // Configure Collection entity
@@ -197,6 +197,7 @@ namespace CarDexDatabase
                     .HasColumnName("pack_price")
                     .HasDefaultValue(0);
                 
+                /*
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -204,6 +205,7 @@ namespace CarDexDatabase
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    */
 
                 // Ignore the Vehicles collection
                 entity.Ignore(e => e.Vehicles);
@@ -231,6 +233,7 @@ namespace CarDexDatabase
                     .HasColumnName("value")
                     .HasDefaultValue(0);
                 
+                /*
                 entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -238,6 +241,7 @@ namespace CarDexDatabase
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    */
 
                 // Foreign keys
                 entity.HasOne<User>()
@@ -281,13 +285,13 @@ namespace CarDexDatabase
                 entity.Property(e => e.WantCardId)
                     .HasColumnName("want_card_id");
                 
-                entity.Property(e => e.CreatedAt)
+                /*entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
                 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
                 // Foreign keys
                 entity.HasOne<User>()
@@ -339,13 +343,13 @@ namespace CarDexDatabase
                     .HasColumnName("executed_date")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
                 
-                entity.Property(e => e.CreatedAt)
+                /*entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
                 
                 entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
                 // Foreign keys
                 entity.HasOne<User>()
@@ -390,16 +394,16 @@ namespace CarDexDatabase
                     .HasColumnName("amount")
                     .HasDefaultValue(0);
                 
-                entity.Property(e => e.CreatedAt)
+                /*entity.Property(e => e.CreatedAt)
                     .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
                 
                 entity.Property(e => e.ClaimedAt)
                     .HasColumnName("claimed_at");
                 
-                entity.Property(e => e.UpdatedAt)
+                /*entity.Property(e => e.UpdatedAt)
                     .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
                 // Foreign keys
                 entity.HasOne<User>()
