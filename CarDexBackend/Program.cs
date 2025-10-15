@@ -1,6 +1,13 @@
 using CarDexBackend.Services;
+using CarDexDatabase;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configure Database Context with PostgreSQL
+builder.Services.AddDbContext<CarDexDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("CarDexDatabase"))
+);
 
 // add services to the container
 builder.Services.AddControllers();
@@ -22,23 +29,23 @@ builder.Services.AddCors(options =>
 // Environment switching for development and production
 if (builder.Environment.IsDevelopment())
 {
-    // use the MOCK service
-    builder.Services.AddSingleton<IAuthService, MockAuthService>();
-    builder.Services.AddSingleton<ICardService, MockCardService>();
-    builder.Services.AddSingleton<ICollectionService, MockCollectionService>();
-    builder.Services.AddSingleton<IPackService, MockPackService>();
-    builder.Services.AddSingleton<ITradeService, MockTradeService>();
-    builder.Services.AddSingleton<IUserService, MockUserService>();
+    // Use PRODUCTION services with real database (Supabase PostgreSQL)
+    builder.Services.AddSingleton<IAuthService, MockAuthService>(); // Keep mock for now (no auth implemented yet)
+    builder.Services.AddScoped<ICardService, CardService>();
+    builder.Services.AddScoped<ICollectionService, CollectionService>();
+    builder.Services.AddScoped<IPackService, PackService>();
+    builder.Services.AddScoped<ITradeService, TradeService>();
+    builder.Services.AddScoped<IUserService, UserService>();
 }
 else
 {
     // use real PRODUCTION services
-    //builder.Services.AddScoped<IAuthService, AuthService>();
-    //builder.Services.AddScoped<ICardService, CardService>();
-    //builder.Services.AddScoped<ICollectionService, CollectionService>();
-    //builder.Services.AddScoped<IPackService, PackService>();
-    //builder.Services.AddSingleton<ITradeService, TradeService>();
-    //builder.Services.AddSingleton<IUserService, UserService>();
+    builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddScoped<ICardService, CardService>();
+    builder.Services.AddScoped<ICollectionService, CollectionService>();
+    builder.Services.AddScoped<IPackService, PackService>();
+    builder.Services.AddScoped<ITradeService, TradeService>();
+    builder.Services.AddScoped<IUserService, UserService>();
 }
 
 var app = builder.Build();
