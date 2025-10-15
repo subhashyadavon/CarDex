@@ -14,27 +14,26 @@ namespace DefaultNamespace
     {
         private readonly CarDexDbContext _context;
         private readonly UserService _userService;
-
+        
+        //Used ChatGPT to set up the base code
         public UserServiceTest()
         {
             // Set up configuration to read from appsettings.json
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory) // Current directory of the test project
-                .AddJsonFile("appsettings.json") // Load appsettings.json
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory) 
+                .AddJsonFile("appsettings.json") 
                 .Build();
-
-            // Get the Supabase connection string from appsettings.json
+            
             var connectionString = configuration.GetConnectionString("SupabaseConnection");
 
-            // Set up the DbContext to use the Supabase PostgreSQL connection string
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
-                .UseNpgsql(connectionString)  // Connect to Supabase using the connection string
+                .UseNpgsql(connectionString)  g
                 .Options;
 
             _context = new CarDexDbContext(options);
 
             // Ensure that the database is up to date with the latest schema
-            _context.Database.Migrate();  // Apply any pending migrations
+            _context.Database.Migrate();  
 
             _userService = new UserService(_context);
         }
@@ -56,8 +55,6 @@ namespace DefaultNamespace
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -82,8 +79,6 @@ namespace DefaultNamespace
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -113,8 +108,6 @@ namespace DefaultNamespace
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -124,7 +117,7 @@ namespace DefaultNamespace
 
             // Assert: Check the returned result
             Assert.NotNull(result);
-            Assert.Equal(0, result.Total); // No cards are seeded in this example
+            Assert.Equal(0, result.Total); 
         }
 
         // Test for retrieving user packs
@@ -138,8 +131,6 @@ namespace DefaultNamespace
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             };
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
@@ -149,7 +140,7 @@ namespace DefaultNamespace
 
             // Assert: Check the returned result
             Assert.NotNull(result);
-            Assert.Equal(0, result.Total); // No packs are seeded in this example
+            Assert.Equal(0, result.Total); 
         }
 
         [Fact]
@@ -162,8 +153,6 @@ namespace DefaultNamespace
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             };
 
             var trade = new CarDexBackend.Domain.Entities.OpenTrade
@@ -173,8 +162,6 @@ namespace DefaultNamespace
                 Type = CarDexBackend.Domain.Enums.TradeEnum.ForCard,
                 CardId = Guid.NewGuid(),
                 Price = 500,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
@@ -202,8 +189,6 @@ namespace DefaultNamespace
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
             };
 
             var completedTrade = new CarDexBackend.Domain.Entities.CompletedTrade
@@ -212,8 +197,6 @@ namespace DefaultNamespace
                 SellerUserId = user.Id,
                 BuyerUserId = Guid.NewGuid(),
                 Price = 500,
-                CreatedAt = DateTime.UtcNow,
-                ExecutedDate = DateTime.UtcNow
             };
 
             _context.Users.Add(user);
@@ -241,8 +224,7 @@ namespace DefaultNamespace
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                
             };
 
             var reward = new CarDexBackend.Domain.Entities.Reward
@@ -252,7 +234,7 @@ namespace DefaultNamespace
                 Type = CarDexBackend.Domain.Enums.RewardEnum.Pack,
                 ItemId = 1,
                 CreatedAt = DateTime.UtcNow,
-                ClaimedAt = null // Unclaimed
+                ClaimedAt = null 
             };
 
             _context.Users.Add(user);
@@ -260,14 +242,14 @@ namespace DefaultNamespace
             await _context.SaveChangesAsync();
 
             // Act
-            var result = await _userService.GetUserRewards(user.Id, false); // Only unclaimed rewards
+            var result = await _userService.GetUserRewards(user.Id, false); 
 
             // Assert
             Assert.NotNull(result);
             Assert.Single(result.Rewards);
             Assert.Equal(reward.Id, result.Rewards.First().Id);
             Assert.Equal(reward.Type.ToString(), result.Rewards.First().Type);
-            Assert.Null(result.Rewards.First().ClaimedAt); // Assert that it’s unclaimed
+            Assert.Null(result.Rewards.First().ClaimedAt); 
         }
 
     }
