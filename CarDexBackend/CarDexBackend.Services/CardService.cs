@@ -52,16 +52,16 @@ namespace CarDexBackend.Services
                 query = query.Where(c => c.Value <= maxValue);
             
             //Used AI to help with sorting implementation
-            // Apply sorting
+            // Apply sorting (date sorting removed - no CreatedAt in DB)
             query = sortBy?.ToLower() switch
             {
                 "value_asc" => query.OrderBy(c => c.Value),
                 "value_desc" => query.OrderByDescending(c => c.Value),
                 "grade_asc" => query.OrderBy(c => c.Grade),
                 "grade_desc" => query.OrderByDescending(c => c.Grade),
-                "date_asc" => query.OrderBy(c => c.CreatedAt),
-                "date_desc" => query.OrderByDescending(c => c.CreatedAt),
-                _ => query.OrderByDescending(c => c.CreatedAt)
+                "date_asc" => query.OrderBy(c => c.Id),  // Fallback to ID ordering
+                "date_desc" => query.OrderByDescending(c => c.Id),
+                _ => query.OrderByDescending(c => c.Id)  // Default order by ID descending
             };
 
             var total = await query.CountAsync();
@@ -77,9 +77,9 @@ namespace CarDexBackend.Services
                     {
                         Id = card.Id,
                         Name = $"{vehicle.Year} {vehicle.Make} {vehicle.Model}",
-                        Grade = card.Grade.ToString(),
+                        Grade = card.Grade.ToString(),  // Will be "FACTORY", "LIMITED_RUN", or "NISMO"
                         Value = card.Value,
-                        CreatedAt = card.CreatedAt ?? DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow  // Not in DB, using current time
                     })
                 .ToListAsync();
 
@@ -108,9 +108,9 @@ namespace CarDexBackend.Services
             {
                 Id = card.Id,
                 Name = vehicleName,
-                Grade = card.Grade.ToString(),
+                Grade = card.Grade.ToString(),  // Will be "FACTORY", "LIMITED_RUN", or "NISMO"
                 Value = card.Value,
-                CreatedAt = card.CreatedAt ?? DateTime.UtcNow,
+                CreatedAt = DateTime.UtcNow,  // Not in DB, using current time
                 Description = vehicleName,
                 VehicleId = card.VehicleId.ToString(),
                 CollectionId = card.CollectionId.ToString(),

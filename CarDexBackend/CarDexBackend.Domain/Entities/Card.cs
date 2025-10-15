@@ -5,14 +5,36 @@ namespace CarDexBackend.Domain.Entities
 {
     public class Card
     {
-        public Guid Id { get; private set; }
-        public Guid UserId { get; private set; }        // Owner
-        public Guid VehicleId { get; private set; }     // Vehicle associated with the card
-        public Guid CollectionId { get; private set; }  // Collection associated with the card
-        public GradeEnum Grade { get; private set; }    // Rarity/grade
-        public int Value { get; private set; }          // Current market value
+        public Guid Id { get; set; }
+        public Guid UserId { get; set; }        // Owner (public setter needed for trade transfers)
+        public Guid VehicleId { get; set; }     // Vehicle associated with the card
+        public Guid CollectionId { get; set; }  // Collection associated with the card
+        public GradeEnum Grade { get; set; }    // Rarity/grade
+        public int Value { get; set; }          // Current market value
 
-        // Constructor// Domain behavior: update value (e.g., based on market)
+        // Parameterless constructor for EF Core
+        public Card()
+        {
+            Id = Guid.Empty;
+            UserId = Guid.Empty;
+            VehicleId = Guid.Empty;
+            CollectionId = Guid.Empty;
+            Grade = GradeEnum.FACTORY;
+            Value = 0;
+        }
+
+        // Constructor
+        public Card(Guid id, Guid userId, Guid vehicleId, Guid collectionId, GradeEnum grade, int value)
+        {
+            Id = id;
+            UserId = userId;
+            VehicleId = vehicleId;
+            CollectionId = collectionId;
+            Grade = grade;
+            Value = value;
+        }
+
+        // Domain behavior: update value (e.g., based on market)
         public void UpdateValue(int newValue)
         {
             if (newValue < 0) throw new InvalidOperationException("Value cannot be negative");
@@ -26,16 +48,5 @@ namespace CarDexBackend.Domain.Entities
                 throw new InvalidOperationException("Cannot downgrade or keep the same grade");
             Grade = newGrade;
         }
-        public Card(Guid id, Guid userId, Guid vehicleId, Guid collectionId, GradeEnum grade, int value)
-        {
-            Id = id;
-            UserId = userId;
-            VehicleId = vehicleId;
-            CollectionId = collectionId;
-            Grade = grade;
-            Value = value;
-        }
-
-        
     }
 }

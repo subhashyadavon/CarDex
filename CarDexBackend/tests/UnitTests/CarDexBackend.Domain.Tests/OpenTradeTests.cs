@@ -26,7 +26,6 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             Assert.Equal(cardId, trade.CardId);
             Assert.Equal(price, trade.Price);
             Assert.Null(trade.WantCardId);
-            Assert.True((DateTime.UtcNow - trade.CreatedAt).TotalSeconds < 3);
         }
 
         [Fact]
@@ -56,7 +55,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             // Act & Assert
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 new OpenTrade(id, TradeEnum.FOR_CARD, Guid.NewGuid(), Guid.NewGuid()));
-            Assert.Equal("WantCardId must be provided for ForCard trades.", ex.Message);
+            Assert.Equal("WantCardId must be provided for FOR_CARD trades.", ex.Message);
         }
 
         [Fact]
@@ -68,7 +67,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             // Act & Assert
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 new OpenTrade(id, TradeEnum.FOR_PRICE, Guid.NewGuid(), Guid.NewGuid(), price: 0));
-            Assert.Equal("Price must be greater than 0 for ForPrice trades.", ex.Message);
+            Assert.Equal("Price must be greater than 0 for FOR_PRICE trades.", ex.Message);
         }
 
         [Fact]
@@ -92,7 +91,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
 
             // Act & Assert
             var ex = Assert.Throws<InvalidOperationException>(() => trade.UpdatePrice(500));
-            Assert.Equal("Only ForPrice trades can update price.", ex.Message);
+            Assert.Equal("Only FOR_PRICE trades can update price.", ex.Message);
         }
 
         [Fact]

@@ -83,14 +83,14 @@ namespace CarDexBackend.Services
             if (wantCardId.HasValue)
                 query = query.Where(t => t.WantCardId == wantCardId);
 
-            // Apply sorting
+            // Apply sorting (date sorting removed - no CreatedAt in DB)
             query = sortBy?.ToLower() switch
             {
                 "price_asc" => query.OrderBy(t => t.Price),
                 "price_desc" => query.OrderByDescending(t => t.Price),
-                "date_asc" => query.OrderBy(t => t.CreatedAt),
-                "date_desc" => query.OrderByDescending(t => t.CreatedAt),
-                _ => query.OrderByDescending(t => t.CreatedAt)
+                "date_asc" => query.OrderBy(t => t.Id),  // Fallback to ID ordering
+                "date_desc" => query.OrderByDescending(t => t.Id),
+                _ => query.OrderByDescending(t => t.Id)  // Default order by ID descending
             };
 
             var total = await query.CountAsync();
@@ -102,13 +102,13 @@ namespace CarDexBackend.Services
                 .Join(_context.Users, t => t.UserId, u => u.Id, (t, u) => new TradeResponse
                 {
                     Id = t.Id,
-                    Type = t.Type.ToString(),
+                    Type = t.Type.ToString(),  // Will be "FOR_CARD" or "FOR_PRICE"
                     UserId = t.UserId,
                     Username = u.Username,
                     CardId = t.CardId,
                     Price = t.Type == TradeEnum.FOR_PRICE ? t.Price : null,
                     WantCardId = t.Type == TradeEnum.FOR_CARD ? t.WantCardId : null,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow  // Not in DB, using current time
                 })
                 .ToListAsync();
 
@@ -137,13 +137,13 @@ namespace CarDexBackend.Services
             var response = new TradeDetailedResponse
             {
                 Id = trade.Id,
-                Type = trade.Type.ToString(),
+                Type = trade.Type.ToString(),  // Will be "FOR_CARD" or "FOR_PRICE"
                 UserId = trade.UserId,
                 Username = user?.Username ?? "Unknown",
                 CardId = trade.CardId,
                 Price = trade.Type == TradeEnum.FOR_PRICE ? trade.Price : null,
                 WantCardId = trade.Type == TradeEnum.FOR_CARD ? trade.WantCardId : null,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow  // Not in DB, using current time
             };
 
             // Populate Card property if card exists
@@ -154,7 +154,7 @@ namespace CarDexBackend.Services
                 {
                     Id = card.Id,
                     Name = vehicle != null ? $"{vehicle.Year} {vehicle.Make} {vehicle.Model}" : "Unknown",
-                    Grade = card.Grade.ToString(),
+                    Grade = card.Grade.ToString(),  // Will be "FACTORY", "LIMITED_RUN", or "NISMO"
                     Value = card.Value,
                     CreatedAt = DateTime.UtcNow,
                     Description = vehicle != null ? $"{vehicle.Make} {vehicle.Model}" : "Unknown",
@@ -175,7 +175,7 @@ namespace CarDexBackend.Services
                     {
                         Id = wantCard.Id,
                         Name = wantVehicle != null ? $"{wantVehicle.Year} {wantVehicle.Make} {wantVehicle.Model}" : "Unknown",
-                        Grade = wantCard.Grade.ToString(),
+                        Grade = wantCard.Grade.ToString(),  // Will be "FACTORY", "LIMITED_RUN", or "NISMO"
                         Value = wantCard.Value,
                         CreatedAt = DateTime.UtcNow,
                         Description = wantVehicle != null ? $"{wantVehicle.Make} {wantVehicle.Model}" : "Unknown",
@@ -227,13 +227,13 @@ namespace CarDexBackend.Services
             return new TradeResponse
             {
                 Id = trade.Id,
-                Type = trade.Type.ToString(),
+                Type = trade.Type.ToString(),  // Will be "FOR_CARD" or "FOR_PRICE"
                 UserId = trade.UserId,
                 Username = user?.Username ?? "Unknown",
                 CardId = trade.CardId,
                 Price = trade.Type == TradeEnum.FOR_PRICE ? trade.Price : null,
                 WantCardId = trade.Type == TradeEnum.FOR_CARD ? trade.WantCardId : null,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow  // Not in DB, using current time
             };
         }
 
@@ -337,7 +337,7 @@ namespace CarDexBackend.Services
             var completedTradeResponse = new CompletedTradeResponse
             {
                 Id = completedTrade.Id,
-                Type = completedTrade.Type.ToString(),
+                Type = completedTrade.Type.ToString(),  // Will be "FOR_CARD" or "FOR_PRICE"
                 SellerUserId = completedTrade.SellerUserId,
                 SellerUsername = seller.Username,
                 SellerCardId = completedTrade.SellerCardId,
@@ -354,7 +354,7 @@ namespace CarDexBackend.Services
                 UserId = sellerRewardEntity.UserId,
                 ItemId = sellerRewardEntity.ItemId,
                 Amount = sellerRewardEntity.Amount,
-                Type = sellerRewardEntity.Type.ToString(),
+                Type = sellerRewardEntity.Type.ToString(),  // Will be "CURRENCY_FROM_TRADE" or "CARD_FROM_TRADE"
                 CreatedAt = DateTime.UtcNow,
                 ClaimedAt = sellerRewardEntity.ClaimedAt
             };
@@ -365,7 +365,7 @@ namespace CarDexBackend.Services
                 UserId = buyerRewardEntity.UserId,
                 ItemId = buyerRewardEntity.ItemId,
                 Amount = buyerRewardEntity.Amount,
-                Type = buyerRewardEntity.Type.ToString(),
+                Type = buyerRewardEntity.Type.ToString(),  // Will be "CARD_FROM_TRADE"
                 CreatedAt = DateTime.UtcNow,
                 ClaimedAt = buyerRewardEntity.ClaimedAt
             };
@@ -405,7 +405,7 @@ namespace CarDexBackend.Services
             return new CompletedTradeResponse
             {
                 Id = trade.Id,
-                Type = trade.Type.ToString(),
+                Type = trade.Type.ToString(),  // Will be "FOR_CARD" or "FOR_PRICE"
                 SellerUserId = trade.SellerUserId,
                 SellerUsername = seller?.Username ?? "Unknown",
                 SellerCardId = trade.SellerCardId,
@@ -437,7 +437,7 @@ namespace CarDexBackend.Services
                 .Select(t => new CompletedTradeResponse
                 {
                     Id = t.Id,
-                    Type = t.Type.ToString(),
+                    Type = t.Type.ToString(),  // Will be "FOR_CARD" or "FOR_PRICE"
                     SellerUserId = t.SellerUserId,
                     SellerUsername = _context.Users.Where(u => u.Id == t.SellerUserId).Select(u => u.Username).FirstOrDefault() ?? "Unknown",
                     SellerCardId = t.SellerCardId,

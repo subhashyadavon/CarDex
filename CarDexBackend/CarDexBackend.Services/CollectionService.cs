@@ -58,9 +58,9 @@ namespace CarDexBackend.Services
                     {
                         Id = card.Id,
                         Name = $"{vehicle.Year} {vehicle.Make} {vehicle.Model}",
-                        Grade = card.Grade.ToString(),
+                        Grade = card.Grade.ToString(),  // Will be "FACTORY", "LIMITED_RUN", or "NISMO"
                         Value = card.Value,
-                        CreatedAt = card.CreatedAt ?? DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow  // Not in DB, using current time
                     })
                 .ToListAsync();
 

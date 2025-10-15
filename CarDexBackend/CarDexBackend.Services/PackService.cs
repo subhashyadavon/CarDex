@@ -88,22 +88,19 @@ namespace CarDexBackend.Services
                 throw new KeyNotFoundException("Pack not found");
 
             var collection = await _context.Collections.FindAsync(pack.CollectionId);
+            if (collection == null)
+                throw new KeyNotFoundException("Collection not found");
             
             // Get preview cards (first 3 vehicles from this collection)
-            // Need to get vehicles that belong to this collection
-            var collectionVehicleIds = await _context.Collections
-                .Where(c => c.Id == pack.CollectionId)
-                .SelectMany(c => c.Vehicles.Select(v => v.Id))
-                .ToListAsync();
-            
+            // Use the Vehicles array from the collection
             var previewCards = await _context.Vehicles
-                .Where(v => collectionVehicleIds.Contains(v.Id))
+                .Where(v => collection.Vehicles.Contains(v.Id))
                 .Take(3)
                 .Select(v => new CardResponse
                 {
                     Id = Guid.NewGuid(), // Preview cards don't have real IDs yet
                     Name = $"{v.Year} {v.Make} {v.Model}",
-                    Grade = GradeEnum.FACTORY.ToString(), // Default grade for preview
+                    Grade = GradeEnum.FACTORY.ToString(), // Default grade for preview - "FACTORY"
                     Value = v.Value,
                     CreatedAt = DateTime.UtcNow
                 })
@@ -113,7 +110,7 @@ namespace CarDexBackend.Services
             {
                 Id = pack.Id,
                 CollectionId = pack.CollectionId,
-                CollectionName = collection?.Name ?? "Unknown",
+                CollectionName = collection.Name,
                 PurchasedAt = DateTime.UtcNow, // Pack doesn't have PurchasedAt field
                 IsOpened = false, // TODO: Add IsOpened field to Pack entity
                 PreviewCards = previewCards,
@@ -131,14 +128,12 @@ namespace CarDexBackend.Services
                 throw new KeyNotFoundException("Pack not found");
 
             var collection = await _context.Collections.FindAsync(pack.CollectionId);
+            if (collection == null)
+                throw new KeyNotFoundException("Collection not found");
             
-            // Get all vehicles from this collection (Vehicle entity doesn't have CollectionId)
-            // Need to use Collection.Vehicles navigation
+            // Get all vehicles from this collection using the Vehicles array
             var vehicles = await _context.Vehicles
-                .Where(v => _context.Collections
-                    .Where(c => c.Id == pack.CollectionId)
-                    .SelectMany(c => c.Vehicles.Select(vehic => vehic.Id))
-                    .Contains(v.Id))
+                .Where(v => collection.Vehicles.Contains(v.Id))
                 .ToListAsync();
 
             if (!vehicles.Any())

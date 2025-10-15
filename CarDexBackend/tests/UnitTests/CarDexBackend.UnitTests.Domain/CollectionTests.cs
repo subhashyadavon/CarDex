@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Linq;
 using CarDexBackend.Domain.Entities;
 using Xunit;
 
@@ -15,10 +15,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             var name = "Classic Cars";
             var image = "classic.png";
             var packPrice = 500;
-            var vehicles = new List<Vehicle>
-            {
-                new Vehicle(Guid.NewGuid(), "1999", "Toyota", "Supra", 90, 85, 88, 1000, "supra.png")
-            };
+            var vehicles = new[] { Guid.NewGuid() };
 
             // Act
             var collection = new Collection(id, name, image, packPrice, vehicles);
@@ -46,21 +43,22 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
         public void AddVehicle_ShouldAddVehicleToList()
         {
             // Arrange
-            var collection = new Collection(Guid.NewGuid(), "Super Cars", "super.png", 1000, new List<Vehicle>());
-            var vehicle = new Vehicle(Guid.NewGuid(), "2022", "Ferrari", "F8", 99, 98, 100, 2000, "f8.png");
+            var collection = new Collection(Guid.NewGuid(), "Super Cars", "super.png", 1000, Array.Empty<Guid>());
+            var vehicleId = Guid.NewGuid();
+            var vehicle = new Vehicle(vehicleId, "2022", "Ferrari", "F8", 99, 98, 100, 2000, "f8.png");
 
             // Act
             collection.AddVehicle(vehicle);
 
             // Assert
-            Assert.Contains(vehicle, collection.Vehicles);
+            Assert.Contains(vehicleId, collection.Vehicles);
         }
 
         [Fact]
         public void AddVehicle_ShouldThrowException_WhenVehicleIsNull()
         {
             // Arrange
-            var collection = new Collection(Guid.NewGuid(), "Test", "test.png", 100, new List<Vehicle>());
+            var collection = new Collection(Guid.NewGuid(), "Test", "test.png", 100, Array.Empty<Guid>());
 
             // Act & Assert
             var exception = Assert.Throws<ArgumentNullException>(() => collection.AddVehicle(null));
@@ -72,8 +70,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
         {
             // Arrange
             var vehicleId = Guid.NewGuid();
-            var vehicle = new Vehicle(vehicleId, "2020", "Lamborghini", "Huracan", 95, 96, 97, 3000, "huracan.png");
-            var collection = new Collection(Guid.NewGuid(), "Luxury Cars", "lux.png", 800, new List<Vehicle> { vehicle });
+            var collection = new Collection(Guid.NewGuid(), "Luxury Cars", "lux.png", 800, new[] { vehicleId });
 
             // Act
             collection.RemoveVehicle(vehicleId);
@@ -87,8 +84,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
         {
             // Arrange
             var vehicleId = Guid.NewGuid();
-            var vehicle = new Vehicle(vehicleId, "2021", "McLaren", "720S", 97, 98, 99, 3500, "mclaren.png");
-            var collection = new Collection(Guid.NewGuid(), "Performance Cars", "perf.png", 900, new List<Vehicle> { vehicle });
+            var collection = new Collection(Guid.NewGuid(), "Performance Cars", "perf.png", 900, new[] { vehicleId });
 
             // Act
             var result = collection.HasVehicle(vehicleId);
@@ -101,7 +97,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
         public void HasVehicle_ShouldReturnFalse_WhenVehicleDoesNotExist()
         {
             // Arrange
-            var collection = new Collection(Guid.NewGuid(), "Vintage Cars", "vintage.png", 300, new List<Vehicle>());
+            var collection = new Collection(Guid.NewGuid(), "Vintage Cars", "vintage.png", 300, Array.Empty<Guid>());
 
             // Act
             var result = collection.HasVehicle(Guid.NewGuid());
@@ -111,3 +107,4 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
         }
     }
 }
+

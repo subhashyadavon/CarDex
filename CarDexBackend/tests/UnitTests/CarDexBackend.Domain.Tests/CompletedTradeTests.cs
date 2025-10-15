@@ -60,7 +60,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             // Act & Assert
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 new CompletedTrade(id, TradeEnum.FOR_CARD, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid()));
-            Assert.Equal("BuyerCardId must be provided for ForCard trades.", ex.Message);
+            Assert.Equal("BuyerCardId must be provided for FOR_CARD trades.", ex.Message);
         }
 
         [Fact]
@@ -72,7 +72,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             // Act & Assert
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 new CompletedTrade(id, TradeEnum.FOR_PRICE, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), price: 0));
-            Assert.Equal("Price must be greater than 0 for ForPrice trades.", ex.Message);
+            Assert.Equal("Price must be greater than 0 for FOR_PRICE trades.", ex.Message);
         }
 
         [Fact]
@@ -84,7 +84,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             // Act & Assert
             var ex = Assert.Throws<InvalidOperationException>(() =>
                 new CompletedTrade(id, TradeEnum.FOR_PRICE, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), price: -100));
-            Assert.Equal("Price must be greater than 0 for ForPrice trades.", ex.Message);
+            Assert.Equal("Price must be greater than 0 for FOR_PRICE trades.", ex.Message);
         }
     }
 }

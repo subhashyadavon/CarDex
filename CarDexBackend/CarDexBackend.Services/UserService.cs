@@ -38,7 +38,7 @@ namespace CarDexBackend.Services
                 {
                     Id = u.Id,
                     Username = u.Username,
-                    CreatedAt = u.CreatedAt ?? DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow  // CreatedAt not in DB, using current time
                 })
                 .FirstOrDefaultAsync();
 
@@ -64,7 +64,6 @@ namespace CarDexBackend.Services
             if (!string.IsNullOrWhiteSpace(request.Username))
                 user.Username = request.Username;
 
-            user.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             return new UserResponse
@@ -72,8 +71,8 @@ namespace CarDexBackend.Services
                 Id = user.Id,
                 Username = user.Username,
                 Currency = user.Currency,
-                CreatedAt = user.CreatedAt ?? DateTime.UtcNow,
-                UpdatedAt = user.UpdatedAt ?? DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,  // Not in DB, using current time
+                UpdatedAt = DateTime.UtcNow   // Not in DB, using current time
             };
         }
 
@@ -112,7 +111,7 @@ namespace CarDexBackend.Services
                     Id = c.Id,
                     VehicleId = c.VehicleId,
                     CollectionId = c.CollectionId,
-                    Grade = c.Grade.ToString(),
+                    Grade = c.Grade.ToString(),  // Will be "FACTORY", "LIMITED_RUN", or "NISMO"
                     Value = c.Value
                 })
                 .ToListAsync();
@@ -231,7 +230,7 @@ namespace CarDexBackend.Services
                     BuyerUserId = t.BuyerUserId,
                     BuyerCardId = t.BuyerCardId,
                     Price = t.Price,
-                    ExecutedDate = t.ExecutedDate ?? DateTime.UtcNow
+                    ExecutedDate = t.ExecutedDate  // Already DateTime, not nullable
                 })
                 .ToListAsync();
 
@@ -269,9 +268,9 @@ namespace CarDexBackend.Services
                 .Select(r => new UserRewardResponse
                 {
                     Id = r.Id,
-                    Type = r.Type.ToString(),
+                    Type = r.Type.ToString(),  // Will be "PACK", "CURRENCY", "CARD_FROM_TRADE", etc.
                     ItemId = r.ItemId,
-                    CreatedAt = r.CreatedAt ?? DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow,  // Not in DB, using current time
                     ClaimedAt = r.ClaimedAt
                 })
                 .ToListAsync();

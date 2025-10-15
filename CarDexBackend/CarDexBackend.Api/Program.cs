@@ -1,12 +1,20 @@
 using CarDexBackend.Services;
 using CarDexDatabase;
 using Microsoft.EntityFrameworkCore;
+using CarDexBackend.Domain.Enums;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Database Context with PostgreSQL
+// Configure Database Context with PostgreSQL and register enum types
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(builder.Configuration.GetConnectionString("CarDexDatabase"));
+dataSourceBuilder.MapEnum<GradeEnum>("grade_enum");
+dataSourceBuilder.MapEnum<TradeEnum>("trade_enum");
+dataSourceBuilder.MapEnum<RewardEnum>("reward_enum");
+var dataSource = dataSourceBuilder.Build();
+
 builder.Services.AddDbContext<CarDexDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("CarDexDatabase"))
+    options.UseNpgsql(dataSource)
 );
 
 // add services to the container

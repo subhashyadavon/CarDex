@@ -26,7 +26,6 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             Assert.Equal(type, reward.Type);
             Assert.Equal(itemId, reward.ItemId);
             Assert.Equal(amount, reward.Amount);
-            Assert.NotEqual(default(DateTime), reward.CreatedAt);
             Assert.Null(reward.ClaimedAt);
         }
 

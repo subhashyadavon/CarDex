@@ -48,16 +48,8 @@ namespace CarDexDatabase
                 entity.Property(e => e.Currency)
                     .HasColumnName("currency")
                     .HasDefaultValue(0);
-                
-                /*entity.Property(e => e.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
-                // Ignore navigation properties (we'll handle arrays differently or skip them)
+                // Ignore navigation properties (arrays in database handled separately)
                 entity.Ignore(e => e.OwnedCards);
                 entity.Ignore(e => e.OwnedPacks);
                 entity.Ignore(e => e.OpenTrades);
@@ -88,20 +80,12 @@ namespace CarDexDatabase
                 
                 entity.Property(e => e.Grade)
                     .HasColumnName("grade")
-                    .HasConversion<string>()
+                    .HasColumnType("grade_enum")
                     .IsRequired();
                 
                 entity.Property(e => e.Value)
                     .HasColumnName("value")
                     .HasDefaultValue(0);
-                
-                /*entity.Property(e => e.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
                 // Foreign keys
                 entity.HasOne<User>()
@@ -164,14 +148,6 @@ namespace CarDexDatabase
                 entity.Property(e => e.Image)
                     .HasColumnName("image")
                     .HasColumnType("text");
-                
-                /*entity.Property(e => e.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
             });
 
             // Configure Collection entity
@@ -197,18 +173,9 @@ namespace CarDexDatabase
                     .HasColumnName("pack_price")
                     .HasDefaultValue(0);
                 
-                /*
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                    */
-
-                // Ignore the Vehicles collection
-                entity.Ignore(e => e.Vehicles);
+                // Map Vehicles array to database array column
+                entity.Property(e => e.Vehicles)
+                    .HasColumnName("vehicles");
             });
 
             // Configure Pack entity
@@ -232,16 +199,6 @@ namespace CarDexDatabase
                 entity.Property(e => e.Value)
                     .HasColumnName("value")
                     .HasDefaultValue(0);
-                
-                /*
-                entity.Property(e => e.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                    */
 
                 // Foreign keys
                 entity.HasOne<User>()
@@ -267,7 +224,7 @@ namespace CarDexDatabase
                 
                 entity.Property(e => e.Type)
                     .HasColumnName("type")
-                    .HasConversion<string>()
+                    .HasColumnType("trade_enum")
                     .IsRequired();
                 
                 entity.Property(e => e.UserId)
@@ -284,14 +241,6 @@ namespace CarDexDatabase
                 
                 entity.Property(e => e.WantCardId)
                     .HasColumnName("want_card_id");
-                
-                /*entity.Property(e => e.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
                 // Foreign keys
                 entity.HasOne<User>()
@@ -317,7 +266,7 @@ namespace CarDexDatabase
                 
                 entity.Property(e => e.Type)
                     .HasColumnName("type")
-                    .HasConversion<string>()
+                    .HasColumnType("trade_enum")
                     .IsRequired();
                 
                 entity.Property(e => e.SellerUserId)
@@ -342,14 +291,6 @@ namespace CarDexDatabase
                 entity.Property(e => e.ExecutedDate)
                     .HasColumnName("executed_date")
                     .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                
-                /*entity.Property(e => e.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
-                
-                entity.Property(e => e.UpdatedAt)
-                    .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
                 // Foreign keys
                 entity.HasOne<User>()
@@ -384,7 +325,7 @@ namespace CarDexDatabase
                 
                 entity.Property(e => e.Type)
                     .HasColumnName("type")
-                    .HasConversion<string>()
+                    .HasColumnType("reward_enum")
                     .IsRequired();
                 
                 entity.Property(e => e.ItemId)
@@ -394,16 +335,8 @@ namespace CarDexDatabase
                     .HasColumnName("amount")
                     .HasDefaultValue(0);
                 
-                /*entity.Property(e => e.CreatedAt)
-                    .HasColumnName("created_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
-                
                 entity.Property(e => e.ClaimedAt)
                     .HasColumnName("claimed_at");
-                
-                /*entity.Property(e => e.UpdatedAt)
-                    .HasColumnName("updated_at")
-                    .HasDefaultValueSql("CURRENT_TIMESTAMP");*/
 
                 // Foreign keys
                 entity.HasOne<User>()
@@ -413,9 +346,10 @@ namespace CarDexDatabase
             });
 
             // Configure PostgreSQL enum types for EF Core
-            modelBuilder.HasPostgresEnum<GradeEnum>();
-            modelBuilder.HasPostgresEnum<TradeEnum>();
-            modelBuilder.HasPostgresEnum<RewardEnum>();
+            // Map C# enums to PostgreSQL enum types in the database
+            modelBuilder.HasPostgresEnum<GradeEnum>("grade_enum");
+            modelBuilder.HasPostgresEnum<TradeEnum>("trade_enum");
+            modelBuilder.HasPostgresEnum<RewardEnum>("reward_enum");
         }
     }
 }

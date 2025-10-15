@@ -2,8 +2,8 @@ namespace CarDexBackend.Domain.Enums
 {
     public enum GradeEnum
     {
-        Factory,
-        LimitedRun,
+        FACTORY,
+        LIMITED_RUN,
         NISMO
     }
 }
