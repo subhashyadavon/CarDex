@@ -2,9 +2,9 @@ namespace CarDexBackend.Domain.Enums
 {
     public enum RewardEnum
     {
-        PACK,
-        CURRENCY,
-        CARD_FROM_TRADE,
-        CURRENCY_FROM_TRADE
+        Pack,               // Reward is a pack
+        Currency,           // Reward is in-game currency
+        CardFromTrade,      // Reward is a card received from trade
+        CurrencyFromTrade   // Reward is currency received from trade
     }
 }

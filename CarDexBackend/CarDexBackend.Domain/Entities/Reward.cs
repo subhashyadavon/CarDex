@@ -5,18 +5,14 @@ namespace CarDexBackend.Domain.Entities
 {
     public class Reward
     {
-        public Guid Id { get; set; }
-        public Guid UserId { get; set; }
-        public RewardEnum Type { get; set; }
-        public Guid? ItemId { get; set; } 
-        public int Amount { get; set; }
+        public Guid Id { get; private set; }
+        public Guid UserId { get; private set; }
+        public RewardEnum Type { get; private set; }
+        public Guid? ItemId { get; private set; } 
+        public int Amount { get; private set; }
 
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? ClaimedAt { get; set; } // Null until claimed
-        public DateTime? UpdatedAt { get; set; }
-
-        // Parameterless constructor for EF Core
-        public Reward() { }
+        public DateTime CreatedAt { get; private set; }
+        public DateTime? ClaimedAt { get; private set; } // Null until claimed
 
         // Constructor
         public Reward(Guid id, Guid userId, RewardEnum type, int amount, Guid? itemId = null)

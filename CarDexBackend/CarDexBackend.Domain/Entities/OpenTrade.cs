@@ -5,18 +5,14 @@ namespace CarDexBackend.Domain.Entities
 {
     public class OpenTrade
     {
-        public Guid Id { get; set; }
-        public TradeEnum Type { get; set; }
-        public Guid UserId { get; set; }       // The user who initiated the trade
-        public Guid CardId { get; set; }       // Card offered in the trade
-        public int Price { get; set; }         // Used if Type == ForPrice
-        public Guid? WantCardId { get; set; }  // Used if Type == ForCard
+        public Guid Id { get; private set; }
+        public TradeEnum Type { get; private set; }
+        public Guid UserId { get; private set; }       // The user who initiated the trade
+        public Guid CardId { get; private set; }       // Card offered in the trade
+        public int Price { get; private set; }         // Used if Type == ForPrice
+        public Guid? WantCardId { get; private set; }  // Used if Type == ForCard
 
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-
-        // Parameterless constructor for EF Core
-        public OpenTrade() { }
+        public DateTime CreatedAt { get; private set; }
 
         // Constructor
         public OpenTrade(Guid id, TradeEnum type, Guid userId, Guid cardId, int price = 0, Guid? wantCardId = null)
@@ -35,17 +31,17 @@ namespace CarDexBackend.Domain.Entities
         // Domain behavior: validate trade fields
         private void ValidateTrade()
         {
-            if (Type == TradeEnum.FOR_CARD && WantCardId == null)
+            if (Type == TradeEnum.ForCard && WantCardId == null)
                 throw new InvalidOperationException("WantCardId must be provided for ForCard trades.");
             
-            if (Type == TradeEnum.FOR_PRICE && Price <= 0)
+            if (Type == TradeEnum.ForPrice && Price <= 0)
                 throw new InvalidOperationException("Price must be greater than 0 for ForPrice trades.");
         }
 
         // Update trade price (for ForPrice trades)
         public void UpdatePrice(int newPrice)
         {
-            if (Type != TradeEnum.FOR_PRICE) throw new InvalidOperationException("Only ForPrice trades can update price.");
+            if (Type != TradeEnum.ForPrice) throw new InvalidOperationException("Only ForPrice trades can update price.");
             if (newPrice <= 0) throw new InvalidOperationException("Price must be greater than 0.");
             Price = newPrice;
         }

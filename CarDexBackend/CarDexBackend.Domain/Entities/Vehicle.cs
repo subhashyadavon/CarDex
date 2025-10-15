@@ -4,25 +4,18 @@ namespace CarDexBackend.Domain.Entities
 {
     public class Vehicle
     {
-        public Guid Id { get; set; }
-        public string Year { get; set; }
-        public string Make { get; set; }
-        public string Model { get; set; }
+        public Guid Id { get; private set; }
+        public string Year { get; private set; }
+        public string Make { get; private set; }
+        public string Model { get; private set; }
 
         // Stats (performance or collectible metrics)
-        public int Stat1 { get; set; }
-        public int Stat2 { get; set; }
-        public int Stat3 { get; set; } 
-        public int Value { get; set; } // Market / rarity value
+        public int Stat1 { get; private set; }
+        public int Stat2 { get; private set; }
+        public int Stat3 { get; private set; } 
+        public int Value { get; private set; } // Market / rarity value
 
-        public string Image { get; set; } // URL or base64
-
-        // Timestamps
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-
-        // Parameterless constructor for EF Core
-        public Vehicle() { }
+        public string Image { get; private set; } // URL or base64
 
         // Constructor
         public Vehicle(Guid id, string year, string make, string model, int stat1, int stat2, int stat3, int value, string image)

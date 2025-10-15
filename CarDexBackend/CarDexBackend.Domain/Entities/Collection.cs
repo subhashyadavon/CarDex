@@ -5,18 +5,11 @@ namespace CarDexBackend.Domain.Entities
 {
     public class Collection
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
-        public string Image { get; set; } // URL or base64
-        public int PackPrice { get; set; } // Price for opening a pack
-        public List<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
-
-        // Timestamps
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-
-        // Parameterless constructor for EF Core
-        public Collection() { }
+        public Guid Id { get; private set; }
+        public string Name { get; private set; }
+        public string Image { get; private set; } // URL or base64
+        public int PackPrice { get; private set; } // Price for opening a pack
+        public List<Vehicle> Vehicles { get; private set; } = new List<Vehicle>();
 
         // Constructor
         public Collection(Guid id, string name, string image, int packPrice, List<Vehicle> vehicles)

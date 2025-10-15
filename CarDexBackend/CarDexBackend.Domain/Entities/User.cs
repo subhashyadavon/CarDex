@@ -6,23 +6,16 @@ namespace CarDexBackend.Domain.Entities
     public class User
     {
         // Primary Identity
-        public Guid Id { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }  
-        public int Currency { get; set; }
+        public Guid Id { get; private set; }
+        public string Username { get; private set; }
+        public string Password { get; private set; }  
+        public int Currency { get; private set; }
 
         // Aggregated Entities
-        public List<Card> OwnedCards { get; set; } = new List<Card>();
-        public List<Pack> OwnedPacks { get; set; } = new List<Pack>();
-        public List<OpenTrade> OpenTrades { get; set; } = new List<OpenTrade>();
-        public List<CompletedTrade> TradeHistory { get; set; } = new List<CompletedTrade>();
-
-        // Timestamps
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-
-        // Parameterless constructor for EF Core
-        public User() { }
+        public List<Card> OwnedCards { get; private set; } = new List<Card>();
+        public List<Pack> OwnedPacks { get; private set; } = new List<Pack>();
+        public List<OpenTrade> OpenTrades { get; private set; } = new List<OpenTrade>();
+        public List<CompletedTrade> TradeHistory { get; private set; } = new List<CompletedTrade>();
 
         // Constructor
         public User(Guid id, string username, string password)
@@ -64,3 +57,4 @@ namespace CarDexBackend.Domain.Entities
         }
     }
 }
+
