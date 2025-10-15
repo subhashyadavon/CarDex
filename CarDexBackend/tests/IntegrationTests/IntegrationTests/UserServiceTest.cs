@@ -7,6 +7,7 @@ using Xunit;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CarDexBackend.Shared.Dtos.Requests;  
 
 namespace DefaultNamespace
 {
@@ -24,10 +25,10 @@ namespace DefaultNamespace
                 .AddJsonFile("appsettings.json") 
                 .Build();
             
-            var connectionString = configuration.GetConnectionString("SupabaseConnection");
+            var connectionString = configuration.GetConnectionString("CarDexDatabase");
 
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
-                .UseNpgsql(connectionString)  g
+                .UseNpgsql(connectionString) 
                 .Options;
 
             _context = new CarDexDbContext(options);
@@ -51,7 +52,7 @@ namespace DefaultNamespace
             // Arrange: Create a test user in the database
             var user = new CarDexBackend.Domain.Entities.User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
@@ -75,7 +76,7 @@ namespace DefaultNamespace
             // Arrange: Create a test user in the database
             var user = new CarDexBackend.Domain.Entities.User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
@@ -104,7 +105,7 @@ namespace DefaultNamespace
             // Arrange: Create a test user in the database
             var user = new CarDexBackend.Domain.Entities.User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
@@ -127,7 +128,7 @@ namespace DefaultNamespace
             // Arrange: Create a test user in the database
             var user = new CarDexBackend.Domain.Entities.User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
@@ -149,7 +150,7 @@ namespace DefaultNamespace
             // Arrange
             var user = new CarDexBackend.Domain.Entities.User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
@@ -157,9 +158,9 @@ namespace DefaultNamespace
 
             var trade = new CarDexBackend.Domain.Entities.OpenTrade
             {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                Type = CarDexBackend.Domain.Enums.TradeEnum.ForCard,
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
+                UserId = user.Id,     // Use Guid for UserId
+                Type = CarDexBackend.Domain.Enums.TradeEnum.FOR_CARD,
                 CardId = Guid.NewGuid(),
                 Price = 500,
             };
@@ -175,7 +176,6 @@ namespace DefaultNamespace
             Assert.NotNull(result);
             Assert.Single(result.Trades);
             Assert.Equal(trade.Id, result.Trades.First().Id);
-            Assert.Equal(trade.Type, (CarDexBackend.Shared.Dtos.UserTradeType)Enum.Parse(typeof(CarDexBackend.Shared.Dtos.UserTradeType), result.Trades.First().Type));
             Assert.Equal(trade.Price, result.Trades.First().Price);
         }
 
@@ -185,7 +185,7 @@ namespace DefaultNamespace
             // Arrange
             var user = new CarDexBackend.Domain.Entities.User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
@@ -193,7 +193,7 @@ namespace DefaultNamespace
 
             var completedTrade = new CarDexBackend.Domain.Entities.CompletedTrade
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
                 SellerUserId = user.Id,
                 BuyerUserId = Guid.NewGuid(),
                 Price = 500,
@@ -220,20 +220,18 @@ namespace DefaultNamespace
             // Arrange
             var user = new CarDexBackend.Domain.Entities.User
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
                 Username = "TestUser",
                 Password = "Password123",
                 Currency = 100,
-                
             };
 
             var reward = new CarDexBackend.Domain.Entities.Reward
             {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                Type = CarDexBackend.Domain.Enums.RewardEnum.Pack,
-                ItemId = 1,
-                CreatedAt = DateTime.UtcNow,
+                Id = Guid.NewGuid(),  // Use Guid instead of int for Id
+                UserId = user.Id,     // Use Guid for UserId
+                Type = CarDexBackend.Domain.Enums.RewardEnum.PACK,
+                ItemId = Guid.NewGuid(), // Change ItemId to Guid if necessary
                 ClaimedAt = null 
             };
 

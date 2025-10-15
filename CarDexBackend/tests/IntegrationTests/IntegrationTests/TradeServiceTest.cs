@@ -7,17 +7,18 @@ using Xunit;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CarDexBackend.Domain.Enums;
 
 namespace DefaultNamespace
 {
-    public class PackServiceTest : IDisposable
+    public class TradeServiceTest : IDisposable
     {
         private readonly CarDexDbContext _context;
-        private readonly PackService _packService;
+        private readonly TradeService _tradeService;
         private readonly IConfiguration _configuration;
 
-        //Used ChatGPT to get the base code and to get help seeding the data
-        public PackServiceTest()
+        //Used ChatGPT to get the base code and get help seeding the data, and to write the test for GetOpenTrade with filters.
+        public TradeServiceTest()
         {
             // Set up configuration to read from appsettings.json
             _configuration = new ConfigurationBuilder()
@@ -25,14 +26,14 @@ namespace DefaultNamespace
                 .AddJsonFile("appsettings.json") 
                 .Build();
 
-            var connectionString = _configuration.GetConnectionString("SupabaseConnection");
-
+            var connectionString = _configuration.GetConnectionString("CarDexDatabase");
+            
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
                 .UseNpgsql(connectionString)  
                 .Options;
 
             _context = new CarDexDbContext(options);
-            _packService = new PackService(_context);
+            _tradeService = new TradeService(_context);
 
             // Seed test data
             SeedTestData();
@@ -51,7 +52,7 @@ namespace DefaultNamespace
             {
                 Id = Guid.NewGuid(),
                 Name = "Collection 1",
-                Vehicles = new int[] { 1, 2 },  
+                Vehicles = new Guid[] { Guid.NewGuid(), Guid.NewGuid() },  // Changed to Guid[] instead of int[]
                 PackPrice = 500
             };
 
@@ -59,7 +60,7 @@ namespace DefaultNamespace
             {
                 Id = Guid.NewGuid(),
                 Name = "Collection 2",
-                Vehicles = new int[] { 3 },  
+                Vehicles = new Guid[] { Guid.NewGuid() },  // Changed to Guid[] instead of int[]
                 PackPrice = 300
             };
 
@@ -71,18 +72,27 @@ namespace DefaultNamespace
             var user1 = new CarDexBackend.Domain.Entities.User
             {
                 Id = Guid.NewGuid(),
-                Username = "TestUser",
+                Username = "TestUser1",
                 Password = "Password123",
                 Currency = 1000 
             };
 
+            var user2 = new CarDexBackend.Domain.Entities.User
+            {
+                Id = Guid.NewGuid(),
+                Username = "TestUser2",
+                Password = "Password456",
+                Currency = 500 
+            };
+
             _context.Users.Add(user1);
+            _context.Users.Add(user2);
             _context.SaveChanges();
 
             // Add test vehicles
             var vehicle1 = new CarDexBackend.Domain.Entities.Vehicle
             {
-                Id = 1, 
+                Id = Guid.NewGuid(),  // Changed to Guid instead of int
                 Year = "2021",
                 Make = "Tesla",
                 Model = "Model S",
@@ -91,7 +101,7 @@ namespace DefaultNamespace
 
             var vehicle2 = new CarDexBackend.Domain.Entities.Vehicle
             {
-                Id = 2,
+                Id = Guid.NewGuid(),  // Changed to Guid instead of int
                 Year = "2020",
                 Make = "Ford",
                 Model = "Mustang",
@@ -100,7 +110,7 @@ namespace DefaultNamespace
 
             var vehicle3 = new CarDexBackend.Domain.Entities.Vehicle
             {
-                Id = 3,
+                Id = Guid.NewGuid(),  // Changed to Guid instead of int
                 Year = "2022",
                 Make = "Chevrolet",
                 Model = "Camaro",
@@ -111,75 +121,79 @@ namespace DefaultNamespace
             _context.Vehicles.Add(vehicle2);
             _context.Vehicles.Add(vehicle3);
             _context.SaveChanges();
-        }
 
-        // Test for PurchasePack
-        [Fact]
-        public async Task PurchasePack_ShouldDeductUserCurrencyAndCreatePack()
-        {
-            // Arrange
-            var collection = _context.Collections.First();
-            var user = _context.Users.First();
-
-            var request = new PackPurchaseRequest
+            // Add test cards
+            var card1 = new CarDexBackend.Domain.Entities.Card
             {
-                CollectionId = collection.Id
+                Id = Guid.NewGuid(),
+                UserId = user1.Id,
+                VehicleId = vehicle1.Id,
+                CollectionId = collection1.Id,
+                Grade = GradeEnum.FACTORY,
+                Value = 70000
             };
 
-            // Act
-            var result = await _packService.PurchasePack(request);
+            var card2 = new CarDexBackend.Domain.Entities.Card
+            {
+                Id = Guid.NewGuid(),
+                UserId = user2.Id,
+                VehicleId = vehicle2.Id,
+                CollectionId = collection2.Id,
+                Grade = GradeEnum.LIMITED_RUN,
+                Value = 50000
+            };
 
-            // Assert
-            Assert.NotNull(result);
-            Assert.Equal(user.Currency - collection.PackPrice, result.UserCurrency); 
-            Assert.Equal(collection.Id, result.Pack.CollectionId); 
+            _context.Cards.Add(card1);
+            _context.Cards.Add(card2);
+            _context.SaveChanges();
         }
-
-        // Test for GetPackById
+        
+        
+        // Test for GetOpenTrades with filters
         [Fact]
-        public async Task GetPackById_ShouldReturnCorrectPackDetails()
+        public async Task GetOpenTrades_ShouldReturnFilteredOpenTrades()
         {
             // Arrange
-            var pack = new CarDexBackend.Domain.Entities.Pack(
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                500); 
-            _context.Packs.Add(pack);
-            _context.SaveChanges();
+            var collectionId = _context.Collections.First().Id;
+            var grade = "FACTORY"; 
+            var minPrice = 500;
 
             // Act
-            var result = await _packService.GetPackById(pack.Id);
+            var result = await _tradeService.GetOpenTrades(
+                type: "FOR_PRICE", 
+                collectionId: collectionId, 
+                grade: grade, 
+                minPrice: minPrice, 
+                maxPrice: null, 
+                vehicleId: null, 
+                wantCardId: null, 
+                sortBy: "price_asc", 
+                limit: 10, 
+                offset: 0
+            );
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(pack.Id, result.Id);
-            Assert.Equal(3, result.PreviewCards.Count); 
-            Assert.Equal(pack.CollectionId, result.CollectionId); 
-            Assert.Equal(false, result.IsOpened); 
+            Assert.NotEmpty(result.Trades); 
+            Assert.True(result.Trades.All(t => t.Price >= minPrice)); 
+            Assert.Equal(10, result.Limit); 
         }
 
-        // Test for OpenPack
+        // Test for GetOpenTradeById
         [Fact]
-        public async Task OpenPack_ShouldGenerateCardsAndRemovePack()
+        public async Task GetOpenTradeById_ShouldReturnCorrectTradeDetails()
         {
             // Arrange
-            var pack = new CarDexBackend.Domain.Entities.Pack(
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                Guid.NewGuid(),
-                500); 
-            _context.Packs.Add(pack);
-            _context.SaveChanges();
+            var tradeId = _context.OpenTrades.First().Id;
 
             // Act
-            var result = await _packService.OpenPack(pack.Id);
+            var result = await _tradeService.GetOpenTradeById(tradeId);
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(5, result.Cards.Count); 
-            Assert.Equal(true, result.Pack.IsOpened); 
-            Assert.DoesNotContain(pack, _context.Packs); 
+            Assert.Equal(tradeId, result.Id);
+            Assert.Equal("TestUser1", result.Username); 
         }
+        
     }
 }

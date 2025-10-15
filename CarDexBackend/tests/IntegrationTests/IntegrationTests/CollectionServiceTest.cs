@@ -25,7 +25,7 @@ namespace DefaultNamespace
                 .AddJsonFile("appsettings.json") 
                 .Build();
             
-            var connectionString = _configuration.GetConnectionString("SupabaseConnection");
+            var connectionString = _configuration.GetConnectionString("CarDexDatabase");
 
             
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
@@ -52,7 +52,7 @@ namespace DefaultNamespace
             {
                 Id = Guid.NewGuid(),
                 Name = "Collection 1",
-                Vehicles = new int[] { 1, 2 },  
+                Vehicles = new Guid[] { Guid.NewGuid(), Guid.NewGuid() },  // Changed to Guid[] instead of int[]
                 PackPrice = 500
             };
 
@@ -60,7 +60,7 @@ namespace DefaultNamespace
             {
                 Id = Guid.NewGuid(),
                 Name = "Collection 2",
-                Vehicles = new int[] { 3 },  
+                Vehicles = new Guid[] { Guid.NewGuid() },  // Changed to Guid[] instead of int[]
                 PackPrice = 300
             };
 
@@ -78,7 +78,7 @@ namespace DefaultNamespace
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Collections.Count); 
+            Assert.Equal(2, result.Collections.Count()); 
             Assert.Equal(2, result.Total); 
             Assert.Equal("Collection 1", result.Collections.First().Name);
             Assert.Equal("Collection 2", result.Collections.Last().Name);

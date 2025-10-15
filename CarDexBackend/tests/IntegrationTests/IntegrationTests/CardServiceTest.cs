@@ -26,7 +26,10 @@ namespace DefaultNamespace
                 .AddJsonFile("appsettings.json") 
                 .Build();
 
-            var connectionString = _configuration.GetConnectionString("SupabaseConnection");
+            var connectionString = _configuration.GetConnectionString("CarDexDatabase");
+            
+            // Debugging line to print the connection string
+            Console.WriteLine("Connection String: " + connectionString);
             
             var options = new DbContextOptionsBuilder<CarDexDbContext>()
                 .UseNpgsql(connectionString)  
@@ -79,7 +82,7 @@ namespace DefaultNamespace
                 UserId = Guid.NewGuid(),
                 VehicleId = vehicle1.Id,
                 CollectionId = Guid.NewGuid(),
-                Grade = CarDexBackend.Domain.Enums.GradeEnum.A,
+                Grade = CarDexBackend.Domain.Enums.GradeEnum.FACTORY,
                 Value = 70000,
                 
             };
@@ -90,7 +93,7 @@ namespace DefaultNamespace
                 UserId = Guid.NewGuid(),
                 VehicleId = vehicle2.Id,
                 CollectionId = Guid.NewGuid(),
-                Grade = CarDexBackend.Domain.Enums.GradeEnum.B,
+                Grade = CarDexBackend.Domain.Enums.GradeEnum.LIMITED_RUN,
                 Value = 50000,
                 
             };
@@ -109,7 +112,7 @@ namespace DefaultNamespace
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Cards.Count); 
+            Assert.Equal(2, result.Cards.Count()); 
             Assert.Equal(2, result.Total); 
             Assert.Equal("2021 Tesla Model S", result.Cards.First().Name);
             Assert.Equal("2020 Ford Mustang", result.Cards.Last().Name);
@@ -155,7 +158,7 @@ namespace DefaultNamespace
 
             // Assert: The first card should be the one with the higher value
             Assert.NotNull(result);
-            Assert.Equal(2, result.Cards.Count);
+            Assert.Equal(2, result.Cards.Count());
             Assert.Equal("2021 Tesla Model S", result.Cards.First().Name);
             Assert.Equal("2020 Ford Mustang", result.Cards.Last().Name);
         }
