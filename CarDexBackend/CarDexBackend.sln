@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{684A4178
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{AD39CCD6-447C-4DFD-AAE2-D1F845F87759}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.UnitTests.Api", "CarDexBackend\tests\UnitTests\CarDexBackend.UnitTests.Api\CarDexBackend.UnitTests.Api.csproj", "{40904DD9-DEF2-4009-B6FB-C09BAAA43748}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.UnitTests.Domain", "tests\UnitTests\CarDexBackend.UnitTests.Domain\CarDexBackend.UnitTests.Domain.csproj", "{38ED0EC0-2625-4313-81D1-0E6AC5DD1C60}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{C4D166B0-DB37-406A-BC9A-5B2D85A9AAED}"
