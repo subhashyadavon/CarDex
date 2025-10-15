@@ -57,18 +57,24 @@ Players can:
 
 ### 🧩 Prerequisites
   - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) (v8.0.414)
+  - reportgenerator (dotnet tool)
   - Git
   - Optional: Visual Studio 2022 or VS Code  
 </br>
 
 ```bash
-# Check installation:
+# Check installation
 dotnet --version
+
+# Check reportgenerator tool, this should show 'dotnet-reportgenerator-globaltool' installed
+dotnet tool list --global
+# (If not installed) run this command to install the tool
+dotnet tool install -g dotnet-reportgenerator-globaltool
 
 # Clone and restore dependencies
 git clone https://github.com/VSHAH1210/CarDex.git
 cd CarDexBackend
-dotnet restores
+dotnet restore
 
 # Build all projects
 dotnet build
@@ -100,7 +106,7 @@ dotnet test
 # Runs tests and collects coverage
 dotnet test --collect:"XPlat Code Coverage"
 
-# Generate an HTML report
+# Generate an HTML report, ensure you followed the tool install steps in the setup steps
 reportgenerator -reports:"**/coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
 
 # Open the report in your browser (Windows)
@@ -121,11 +127,11 @@ It will be used as a baseline for the rest of the logic engines, including their
 
 
 ```bash
-# Check installation:
+# Check installation
 node --version
 npm --version
 
-# Clone and restore dependencies
+# Clone
 git clone https://github.com/VSHAH1210/CarDex.git
 cd CarDexFrontend
 ```
