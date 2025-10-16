@@ -46,7 +46,7 @@ namespace CarDexBackend.Domain.Tests
         {
             var user = new User(Guid.NewGuid(), "TestUser", "pass");
             // use an existing GradeEnum value (Factory, LimitedRun, or NISMO)
-            var card = new Card(Guid.NewGuid(), user.Id, Guid.NewGuid(), Guid.NewGuid(), GradeEnum.Factory, 100);
+            var card = new Card(Guid.NewGuid(), user.Id, Guid.NewGuid(), Guid.NewGuid(), GradeEnum.FACTORY, 100);
 
             user.AddCard(card);
             Assert.Contains(card, user.OwnedCards);
@@ -56,7 +56,7 @@ namespace CarDexBackend.Domain.Tests
         public void HasCard_ShouldReturnTrue_WhenCardExists()
         {
             var user = new User(Guid.NewGuid(), "TestUser", "pass");
-            var card = new Card(Guid.NewGuid(), user.Id, Guid.NewGuid(), Guid.NewGuid(), GradeEnum.Factory, 100);
+            var card = new Card(Guid.NewGuid(), user.Id, Guid.NewGuid(), Guid.NewGuid(), GradeEnum.FACTORY, 100);
             user.AddCard(card);
 
             Assert.True(user.HasCard(card.Id));
@@ -77,7 +77,7 @@ namespace CarDexBackend.Domain.Tests
         public void AddOpenTrade_ShouldAddTradeToOpenTrades()
         {
             var user = new User(Guid.NewGuid(), "TestUser", "pass");
-            var trade = new OpenTrade(Guid.NewGuid(), TradeEnum.ForPrice, user.Id, Guid.NewGuid(), 100);
+            var trade = new OpenTrade(Guid.NewGuid(), TradeEnum.FOR_PRICE, user.Id, Guid.NewGuid(), 100);
 
             user.AddOpenTrade(trade);
             Assert.Contains(trade, user.OpenTrades);
@@ -89,13 +89,13 @@ namespace CarDexBackend.Domain.Tests
             var user = new User(Guid.NewGuid(), "TestUser", "pass");
             var tradeId = Guid.NewGuid();
 
-            var openTrade = new OpenTrade(tradeId, TradeEnum.ForPrice, user.Id, Guid.NewGuid(), 100);
+            var openTrade = new OpenTrade(tradeId, TradeEnum.FOR_PRICE, user.Id, Guid.NewGuid(), 100);
             user.AddOpenTrade(openTrade);
 
             
             var completedTrade = new CompletedTrade(
                 tradeId,
-                TradeEnum.ForPrice,
+                TradeEnum.FOR_PRICE,
                 user.Id,          // sellerUserId
                 Guid.NewGuid(),   // sellerCardId
                 Guid.NewGuid(),   // buyerUserId

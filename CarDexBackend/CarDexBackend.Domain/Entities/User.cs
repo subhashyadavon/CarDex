@@ -6,16 +6,25 @@ namespace CarDexBackend.Domain.Entities
     public class User
     {
         // Primary Identity
-        public Guid Id { get; private set; }
-        public string Username { get; private set; }
-        public string Password { get; private set; }  
-        public int Currency { get; private set; }
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }  
+        public int Currency { get; set; }
 
-        // Aggregated Entities
+        // Aggregated Entities (ignored in DbContext - arrays in database)
         public List<Card> OwnedCards { get; private set; } = new List<Card>();
         public List<Pack> OwnedPacks { get; private set; } = new List<Pack>();
         public List<OpenTrade> OpenTrades { get; private set; } = new List<OpenTrade>();
         public List<CompletedTrade> TradeHistory { get; private set; } = new List<CompletedTrade>();
+
+        // Parameterless constructor for EF Core
+        public User()
+        {
+            Id = Guid.Empty;
+            Username = string.Empty;
+            Password = string.Empty;
+            Currency = 0;
+        }
 
         // Constructor
         public User(Guid id, string username, string password)

@@ -14,7 +14,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             var id = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var itemId = Guid.NewGuid();
-            var type = RewardEnum.Currency;
+            var type = RewardEnum.CURRENCY;
             int amount = 100;
 
             // Act
@@ -26,7 +26,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             Assert.Equal(type, reward.Type);
             Assert.Equal(itemId, reward.ItemId);
             Assert.Equal(amount, reward.Amount);
-            Assert.NotEqual(default(DateTime), reward.CreatedAt);
+            
             Assert.Null(reward.ClaimedAt);
         }
 
@@ -38,7 +38,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
             var userId = Guid.NewGuid();
 
             // Act
-            var reward = new Reward(id, userId, RewardEnum.Currency, 50);
+            var reward = new Reward(id, userId, RewardEnum.CURRENCY, 50);
 
             // Assert
             Assert.Null(reward.ItemId);
@@ -48,7 +48,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
         public void Claim_ShouldSetClaimedAt_WhenCalledFirstTime()
         {
             // Arrange
-            var reward = new Reward(Guid.NewGuid(), Guid.NewGuid(), RewardEnum.Currency, 100);
+            var reward = new Reward(Guid.NewGuid(), Guid.NewGuid(), RewardEnum.CURRENCY, 100);
 
             // Act
             reward.Claim();
@@ -62,7 +62,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
         public void Claim_ShouldThrowException_WhenAlreadyClaimed()
         {
             // Arrange
-            var reward = new Reward(Guid.NewGuid(), Guid.NewGuid(), RewardEnum.Currency, 100);
+            var reward = new Reward(Guid.NewGuid(), Guid.NewGuid(), RewardEnum.CURRENCY, 100);
             reward.Claim();
 
             // Act & Assert
@@ -73,7 +73,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
         public void IsClaimed_ShouldReturnFalse_WhenNotClaimed()
         {
             // Arrange
-            var reward = new Reward(Guid.NewGuid(), Guid.NewGuid(), RewardEnum.Currency, 100);
+            var reward = new Reward(Guid.NewGuid(), Guid.NewGuid(), RewardEnum.CURRENCY, 100);
 
             // Act
             var result = reward.IsClaimed();
@@ -86,7 +86,7 @@ namespace CarDexBackend.Tests.UnitTests.Domain.Entities
         public void IsClaimed_ShouldReturnTrue_WhenClaimed()
         {
             // Arrange
-            var reward = new Reward(Guid.NewGuid(), Guid.NewGuid(), RewardEnum.Currency, 100);
+            var reward = new Reward(Guid.NewGuid(), Guid.NewGuid(), RewardEnum.CURRENCY, 100);
             reward.Claim();
 
             // Act

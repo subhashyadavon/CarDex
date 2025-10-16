@@ -4,10 +4,19 @@ namespace CarDexBackend.Domain.Entities
 {
     public class Pack
     {
-        public Guid Id { get; private set; }
-        public Guid UserId { get; private set; }        // Owner
-        public Guid CollectionId { get; private set; }  // Collection this pack belongs to
-        public int Value { get; private set; }          // Current value of the pack
+        public Guid Id { get; set; }
+        public Guid UserId { get; set; }        // Owner
+        public Guid CollectionId { get; set; }  // Collection this pack belongs to
+        public int Value { get; set; }          // Current value of the pack
+
+        // Parameterless constructor for EF Core
+        public Pack()
+        {
+            Id = Guid.Empty;
+            UserId = Guid.Empty;
+            CollectionId = Guid.Empty;
+            Value = 0;
+        }
 
         // Constructor
         public Pack(Guid id, Guid userId, Guid collectionId, int value)
