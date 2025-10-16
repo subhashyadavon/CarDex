@@ -31,6 +31,7 @@
     <ProjectReference Include="..\..\CarDexBackend.Domain\CarDexBackend.Domain.csproj" />
     <ProjectReference Include="..\..\Shared\CarDexBackend.Dtos\CarDexBackend.Dtos.csproj" />
     <ProjectReference Include="..\..\..\CarDexDatabase\CarDexDatabase.csproj" />
+    <ProjectReference Include="..\..\..\CarDexBackend.Api\CarDexBackend.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>
