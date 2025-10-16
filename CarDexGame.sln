@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.Domain", "Car
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.UnitTests.Domain", "CarDexBackend\tests\UnitTests\CarDexBackend.UnitTests.Domain\CarDexBackend.UnitTests.Domain.csproj", "{3D76DF37-95B2-42B3-A2EB-6CE15D3E07B5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IntegrationTests", "IntegrationTests", "{FB5C7B4B-3967-430B-A65A-66B3A40B323E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CarDexBackend.IntegrationTests.Services", "CarDexBackend\tests\IntegrationTests\CarDexBackend.IntegrationTests.Services\CarDexBackend.IntegrationTests.Services.csproj", "{7E8CB81B-078B-4BB4-AF01-5AADF9E6F833}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -56,6 +60,10 @@ Global
 		{3D76DF37-95B2-42B3-A2EB-6CE15D3E07B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D76DF37-95B2-42B3-A2EB-6CE15D3E07B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D76DF37-95B2-42B3-A2EB-6CE15D3E07B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E8CB81B-078B-4BB4-AF01-5AADF9E6F833}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E8CB81B-078B-4BB4-AF01-5AADF9E6F833}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E8CB81B-078B-4BB4-AF01-5AADF9E6F833}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E8CB81B-078B-4BB4-AF01-5AADF9E6F833}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E2948707-2A4F-42DB-AE41-DF22EFE3506F} = {33CECF2C-F87F-4DCA-B6D1-D0705F94F750}
@@ -67,5 +75,7 @@ Global
 		{39303BC3-3904-497D-B8F3-0B7C5175096E} = {7AA1F85B-084F-40DB-B31C-91540839B9F6}
 		{0405FC1B-AD52-4853-890F-2577C9B1D11D} = {33CECF2C-F87F-4DCA-B6D1-D0705F94F750}
 		{3D76DF37-95B2-42B3-A2EB-6CE15D3E07B5} = {4BF47C53-0EB2-4A06-8B63-A0C73D6492FD}
+		{FB5C7B4B-3967-430B-A65A-66B3A40B323E} = {A7704D3F-817E-40A0-9702-455910633655}
+		{7E8CB81B-078B-4BB4-AF01-5AADF9E6F833} = {FB5C7B4B-3967-430B-A65A-66B3A40B323E}
 	EndGlobalSection
 EndGlobal
