@@ -3,17 +3,14 @@ name: Database CI
 on:
   push:
     paths:
-      - 'CarDex/CarDexDatabase/**'
+      - 'CarDexDatabase/**'
   pull_request:
     paths:
-      - 'CarDex/CarDexDatabase/**'
+      - 'CarDexDatabase/**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: CarDex/CarDexDatabase
 
     steps:
       - name: Checkout code

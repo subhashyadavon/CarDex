@@ -50,3 +50,7 @@ jobs:
           name: coverage-report
           path: CoverageReport
 
+      - name: Open coverage report
+        run: open CoverageReport/index.html
+
+
