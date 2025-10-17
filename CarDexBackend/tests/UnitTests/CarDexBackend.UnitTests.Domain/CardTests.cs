@@ -43,15 +43,15 @@ namespace CarDexBackend.Domain.Tests
             Assert.Equal(GradeEnum.LIMITED_RUN, card.Grade);
         }
 
-        // [Fact]
-        // public void UpgradeGrade_ShouldThrow_WhenNewGradeIsLowerOrEqual()
-        // {
-        //     // Arrange
-        //     var card = new Card(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), GradeEnum.LIMITED_RUN, 100);
+        [Fact]
+        public void UpgradeGrade_ShouldThrow_WhenNewGradeIsLowerOrEqual()
+        {
+            // Arrange
+            var card = new Card(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), GradeEnum.LIMITED_RUN, 100);
 
-        //     // Act & Assert
-        //     Assert.Throws<InvalidOperationException>(() => card.UpgradeGrade(GradeEnum.FACTORY));
-        //     Assert.Throws<InvalidOperationException>(() => card.UpgradeGrade(GradeEnum.LIMITED_RUN)); // same grade
-        // }
+            // Act & Assert
+            Assert.Throws<InvalidOperationException>(() => card.UpgradeGrade(GradeEnum.FACTORY));
+            Assert.Throws<InvalidOperationException>(() => card.UpgradeGrade(GradeEnum.LIMITED_RUN)); // same grade
+        }
     }
 }
