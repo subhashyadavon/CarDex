@@ -1,1 +1,34 @@
 name: Database CI
+
+on:
+  push:
+    paths:
+      - 'CarDex/CarDexDatabase/**'
+  pull_request:
+    paths:
+      - 'CarDex/CarDexDatabase/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: CarDex/CarDexDatabase
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.414
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run EF Core migrations check
+        run: dotnet ef migrations script --no-build
