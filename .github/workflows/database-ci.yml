@@ -27,8 +27,4 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      - name: Install EF Core CLI
-        run: dotnet tool install --global dotnet-ef
 
-      - name: Run EF Core migrations script
-        run: dotnet ef migrations script --no-build
