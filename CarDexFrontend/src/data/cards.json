@@ -78,5 +78,13 @@
     "collection_id": 1,
     "grade": "FACTORY",
     "value": 1800
+  },
+  {
+    "id": 11,
+    "user_id": 4,
+    "vehicle_id": 2,
+    "collection_id": 1,
+    "grade": "FACTORY",
+    "value": 1800
   }
 ]
