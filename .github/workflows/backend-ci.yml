@@ -50,10 +50,6 @@ jobs:
           name: coverage-report
           path: CoverageReport
 
-      - name: Add coverage report link to summary
-        run: |
-          echo "### ✅ Code Coverage Report Generated" >> $GITHUB_STEP_SUMMARY
-          echo "You can download and view it here:" >> $GITHUB_STEP_SUMMARY
-          echo "[📊 Coverage Report](./artifacts/coverage-report/index.html)" >> $GITHUB_STEP_SUMMARY
+   
 
 
