@@ -83,31 +83,31 @@ namespace CarDexBackend.Domain.Tests
             Assert.Contains(trade, user.OpenTrades);
         }
 
-        // [Fact]
-        // public void CompleteTrade_ShouldMoveTradeFromOpenToHistory()
-        // {
-        //     var user = new User(Guid.NewGuid(), "TestUser", "pass");
-        //     var tradeId = Guid.NewGuid();
+        [Fact]
+        public void CompleteTrade_ShouldMoveTradeFromOpenToHistory()
+        {
+            var user = new User(Guid.NewGuid(), "TestUser", "pass");
+            var tradeId = Guid.NewGuid();
 
-        //     var openTrade = new OpenTrade(tradeId, TradeEnum.FOR_PRICE, user.Id, Guid.NewGuid(), 100);
-        //     user.AddOpenTrade(openTrade);
+            var openTrade = new OpenTrade(tradeId, TradeEnum.FOR_PRICE, user.Id, Guid.NewGuid(), 100);
+            user.AddOpenTrade(openTrade);
 
             
-        //     var completedTrade = new CompletedTrade(
-        //         tradeId,
-        //         TradeEnum.FOR_PRICE,
-        //         user.Id,          // sellerUserId
-        //         Guid.NewGuid(),   // sellerCardId
-        //         Guid.NewGuid(),   // buyerUserId
-        //         100,              // price
-        //         null              // buyerCardId
-        //     );
+            var completedTrade = new CompletedTrade(
+                tradeId,
+                TradeEnum.FOR_PRICE,
+                user.Id,          // sellerUserId
+                Guid.NewGuid(),   // sellerCardId
+                Guid.NewGuid(),   // buyerUserId
+                100,              // price
+                null              // buyerCardId
+            );
 
-        //     user.CompleteTrade(completedTrade);
+            user.CompleteTrade(completedTrade);
 
-        //     Assert.Contains(completedTrade, user.TradeHistory);
-        //     Assert.DoesNotContain(openTrade, user.OpenTrades);
-        // }
+            Assert.Contains(completedTrade, user.TradeHistory);
+            Assert.DoesNotContain(openTrade, user.OpenTrades);
+        }
 
     }
 }
